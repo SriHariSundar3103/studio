@@ -11,6 +11,8 @@ export type Product = {
   isDealOfTheDay: boolean;
   rating: number;
   reviewCount: number;
+  strap: string;
+  color: string;
 };
 
 export type Category = {

@@ -41,6 +41,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
   }
 
   const categoryName = currentCategory ? currentCategory.name : 'All';
+  const isWomenCategory = category === 'women';
 
   return (
     <div className="container py-8">
@@ -50,29 +51,48 @@ export default function CategoryPage({ params }: { params: { category: string } 
             <BreadcrumbLink href="/">Home</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/products/all">Products</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{categoryName} Watches</BreadcrumbPage>
-          </BreadcrumbItem>
+          {isWomenCategory ? (
+            <BreadcrumbItem>
+              <BreadcrumbPage>Women Watches</BreadcrumbPage>
+            </BreadcrumbItem>
+          ) : (
+            <>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/products/all">Products</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{categoryName} Watches</BreadcrumbPage>
+            </BreadcrumbItem>
+            </>
+          )}
         </BreadcrumbList>
       </Breadcrumb>
       
-      <div className="flex items-baseline justify-between mb-8 border-b pb-4">
-        <h1 className="text-4xl font-bold tracking-tight">{categoryName} Watches</h1>
+      <div className="border-b pb-4 mb-8">
+        {isWomenCategory ? (
+          <div className='text-center'>
+            <h1 className="text-4xl font-bold tracking-tight text-primary">Women's Watches Collection</h1>
+            <p className="mt-2 text-lg text-muted-foreground">Elegant and trendy watches for every occasion</p>
+          </div>
+        ) : (
+          <h1 className="text-4xl font-bold tracking-tight">{categoryName} Watches</h1>
+        )}
+      </div>
+
+       <div className="flex items-baseline justify-between mb-8">
+        <p className="text-sm text-muted-foreground">{filteredProducts.length} products</p>
         <div className="flex items-center gap-4">
-            <p className="text-muted-foreground">{filteredProducts.length} products</p>
             <Select>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="popularity">Popularity</SelectItem>
+                <SelectItem value="trending">Trending</SelectItem>
+                <SelectItem value="newest">New Arrivals</SelectItem>
                 <SelectItem value="price-asc">Price: Low to High</SelectItem>
                 <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="popularity">Popularity</SelectItem>
               </SelectContent>
             </Select>
         </div>
@@ -80,7 +100,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="hidden lg:block">
-          <ProductFilters />
+          <ProductFilters category={category} />
         </aside>
         <main className="lg:col-span-3">
           {filteredProducts.length > 0 ? (

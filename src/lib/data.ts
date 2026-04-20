@@ -31,7 +31,9 @@ export const products: Product[] = [
     isTrending: true,
     isDealOfTheDay: false,
     rating: 4.5,
-    reviewCount: 120
+    reviewCount: 120,
+    strap: 'Leather',
+    color: 'Silver'
   },
   {
     id: 'hsk-m-002',
@@ -45,7 +47,9 @@ export const products: Product[] = [
     isTrending: true,
     isDealOfTheDay: true,
     rating: 4.7,
-    reviewCount: 250
+    reviewCount: 250,
+    strap: 'Stainless Steel',
+    color: 'Silver'
   },
   {
     id: 'hsk-w-001',
@@ -59,7 +63,9 @@ export const products: Product[] = [
     isTrending: true,
     isDealOfTheDay: false,
     rating: 4.8,
-    reviewCount: 180
+    reviewCount: 180,
+    strap: 'Leather',
+    color: 'Rose Gold'
   },
   {
     id: 'hsk-w-002',
@@ -73,7 +79,9 @@ export const products: Product[] = [
     isTrending: false,
     isDealOfTheDay: false,
     rating: 4.6,
-    reviewCount: 95
+    reviewCount: 95,
+    strap: 'Metal',
+    color: 'Silver'
   },
   {
     id: 'hsk-k-001',
@@ -87,7 +95,9 @@ export const products: Product[] = [
     isTrending: false,
     isDealOfTheDay: true,
     rating: 4.9,
-    reviewCount: 300
+    reviewCount: 300,
+    strap: 'Silicone',
+    color: 'Blue'
   },
     {
     id: 'hsk-m-003',
@@ -101,7 +111,9 @@ export const products: Product[] = [
     isTrending: false,
     isDealOfTheDay: false,
     rating: 4.4,
-    reviewCount: 88
+    reviewCount: 88,
+    strap: 'Silicone',
+    color: 'Black'
   },
   {
     id: 'hsk-w-003',
@@ -115,7 +127,9 @@ export const products: Product[] = [
     isTrending: true,
     isDealOfTheDay: false,
     rating: 4.7,
-    reviewCount: 150
+    reviewCount: 150,
+    strap: 'Mesh',
+    color: 'Gold'
   },
     {
     id: 'hsk-k-002',
@@ -129,6 +143,8 @@ export const products: Product[] = [
     isTrending: false,
     isDealOfTheDay: false,
     rating: 4.9,
-    reviewCount: 412
+    reviewCount: 412,
+    strap: 'Fabric',
+    color: 'Pink'
   }
 ];
