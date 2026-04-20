@@ -10,6 +10,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
 
 
 export async function generateStaticParams() {
@@ -52,9 +60,22 @@ export default function CategoryPage({ params }: { params: { category: string } 
         </BreadcrumbList>
       </Breadcrumb>
       
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-baseline justify-between mb-8 border-b pb-4">
         <h1 className="text-4xl font-bold tracking-tight">{categoryName} Watches</h1>
-        <p className="text-muted-foreground">{filteredProducts.length} products</p>
+        <div className="flex items-center gap-4">
+            <p className="text-muted-foreground">{filteredProducts.length} products</p>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="popularity">Popularity</SelectItem>
+                <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+              </SelectContent>
+            </Select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -63,7 +84,18 @@ export default function CategoryPage({ params }: { params: { category: string } 
         </aside>
         <main className="lg:col-span-3">
           {filteredProducts.length > 0 ? (
-            <ProductGrid products={filteredProducts} />
+            <>
+              <ProductGrid products={filteredProducts} />
+              <div className="flex justify-center items-center mt-12 space-x-1">
+                <Button variant="outline">Previous</Button>
+                <Button variant="outline" size="icon">1</Button>
+                <Button variant="ghost" size="icon">2</Button>
+                <Button variant="ghost" size="icon">3</Button>
+                <span className="p-2 text-muted-foreground">...</span>
+                <Button variant="ghost" size="icon">10</Button>
+                <Button variant="outline">Next</Button>
+              </div>
+            </>
           ) : (
             <div className="text-center py-16">
               <h2 className="text-2xl font-semibold">No Products Found</h2>

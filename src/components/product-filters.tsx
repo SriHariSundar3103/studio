@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 const styles = ['Formal', 'Casual', 'Sports', 'Luxury', 'Fashion'];
+const strapTypes = ['Leather Strap', 'Stainless Steel', 'Silicone Strap'];
 
 export function ProductFilters() {
   const [priceRange, setPriceRange] = useState([0, 6000]);
@@ -44,12 +45,28 @@ export function ProductFilters() {
           <div className="space-y-2">
             {styles.map((style) => (
               <div key={style} className="flex items-center space-x-2">
-                <Checkbox id={`style-${style}`} />
+                <Checkbox id={`style-${style.toLowerCase()}`} />
                 <label
-                  htmlFor={`style-${style}`}
+                  htmlFor={`style-${style.toLowerCase()}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {style}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-3">
+          <Label className="font-semibold">Strap</Label>
+          <div className="space-y-2">
+            {strapTypes.map((strap) => (
+              <div key={strap} className="flex items-center space-x-2">
+                <Checkbox id={`strap-${strap.toLowerCase().replace(' ', '-')}`} />
+                <label
+                  htmlFor={`strap-${strap.toLowerCase().replace(' ', '-')}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {strap}
                 </label>
               </div>
             ))}
