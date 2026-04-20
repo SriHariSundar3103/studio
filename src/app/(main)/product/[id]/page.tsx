@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { products } from '@/lib/data';
+import { products, businessDetails } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Breadcrumb,
@@ -109,8 +109,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <p className="text-base text-muted-foreground leading-relaxed">{product.description}</p>
           
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="flex-1">
-              <Phone className="mr-2 h-5 w-5" /> Call Now to Order
+            <Button asChild size="lg" className="flex-1">
+              <a href={`tel:${businessDetails.phone}`}>
+                <Phone className="mr-2 h-5 w-5" /> Call Now to Order
+              </a>
             </Button>
             <Button size="lg" variant="outline" className="flex-1 border-accent text-accent hover:bg-accent hover:text-accent-foreground">
               Order via GPay

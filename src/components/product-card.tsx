@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Heart, Eye, Phone } from 'lucide-react';
+import { businessDetails } from '@/lib/data';
 
 interface ProductCardProps {
   product: Product;
@@ -67,9 +68,11 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-muted-foreground">({product.reviewCount})</span>
           </div>
         </div>
-        <Button className="w-full mt-2">
-            <Phone className="mr-2 h-4 w-4" />
-            Call to Order
+        <Button asChild className="w-full mt-2">
+            <a href={`tel:${businessDetails.phone}`}>
+                <Phone className="mr-2 h-4 w-4" />
+                Call to Order
+            </a>
         </Button>
       </div>
     </Card>
