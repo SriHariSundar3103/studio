@@ -1,3 +1,148 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-banner",
+      "description": "A stylish watch on a wrist, with a blurred background.",
+      "imageUrl": "https://picsum.photos/seed/hero/1280/400",
+      "imageHint": "watch lifestyle"
+    },
+    {
+      "id": "category-men",
+      "description": "A man's watch on a textured surface.",
+      "imageUrl": "https://picsum.photos/seed/catmen/600/400",
+      "imageHint": "man watch"
+    },
+    {
+      "id": "category-women",
+      "description": "An elegant woman's watch.",
+      "imageUrl": "https://picsum.photos/seed/catwomen/600/400",
+      "imageHint": "woman watch"
+    },
+    {
+      "id": "category-kids",
+      "description": "A colorful kid's watch.",
+      "imageUrl": "https://picsum.photos/seed/catkids/600/400",
+      "imageHint": "kids watch"
+    },
+    {
+      "id": "hsk-m-001-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-001-1/800/800",
+      "imageHint": "pilot watch"
+    },
+    {
+      "id": "hsk-m-001-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-001-2/800/800",
+      "imageHint": "watch dial"
+    },
+    {
+      "id": "hsk-m-001-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-001-3/800/800",
+      "imageHint": "leather strap"
+    },
+    {
+      "id": "hsk-m-002-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-002-1/800/800",
+      "imageHint": "minimalist watch"
+    },
+    {
+      "id": "hsk-m-002-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-002-2/800/800",
+      "imageHint": "mesh bracelet"
+    },
+    {
+      "id": "hsk-m-002-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-002-3/800/800",
+      "imageHint": "classic watch"
+    },
+    {
+      "id": "hsk-m-003-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-003-1/800/800",
+      "imageHint": "sports watch"
+    },
+    {
+      "id": "hsk-m-003-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-003-2/800/800",
+      "imageHint": "chronograph dial"
+    },
+    {
+      "id": "hsk-m-003-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-003-3/800/800",
+      "imageHint": "watch action"
+    },
+    {
+      "id": "hsk-w-001-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-001-1/800/800",
+      "imageHint": "elegant watch"
+    },
+    {
+      "id": "hsk-w-001-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-001-2/800/800",
+      "imageHint": "rose gold"
+    },
+    {
+      "id": "hsk-w-001-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-001-3/800/800",
+      "imageHint": "watch fashion"
+    },
+    {
+      "id": "hsk-w-002-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-002-1/800/800",
+      "imageHint": "silver watch"
+    },
+    {
+      "id": "hsk-w-002-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-002-2/800/800",
+      "imageHint": "crystal watch"
+    },
+    {
+      "id": "hsk-w-002-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-002-3/800/800",
+      "imageHint": "woman lifestyle"
+    },
+    {
+      "id": "hsk-w-003-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-003-1/800/800",
+      "imageHint": "gold watch"
+    },
+    {
+      "id": "hsk-w-003-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-003-2/800/800",
+      "imageHint": "floral design"
+    },
+    {
+      "id": "hsk-w-003-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-w-003-3/800/800",
+      "imageHint": "fashion accessory"
+    },
+    {
+      "id": "hsk-k-001-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-001-1/800/800",
+      "imageHint": "kids digital"
+    },
+    {
+      "id": "hsk-k-001-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-001-2/800/800",
+      "imageHint": "blue watch"
+    },
+    {
+      "id": "hsk-k-001-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-001-3/800/800",
+      "imageHint": "child playing"
+    },
+    {
+      "id": "hsk-k-002-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-002-1/800/800",
+      "imageHint": "kids learning"
+    },
+    {
+      "id": "hsk-k-002-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-002-2/800/800",
+      "imageHint": "colorful watch"
+    },
+    {
+      "id": "hsk-k-002-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-k-002-3/800/800",
+      "imageHint": "child writing"
+    }
+  ]
 }
