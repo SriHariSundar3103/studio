@@ -47,11 +47,6 @@ service cloud.firestore {
     function isUpdatingOwnWishlist(userId) { return isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; }
 
     // UserProfile-specific helpers
-    function isCreatingOwnProfile(userId) {
-      return isOwner(userId)
-             && request.resource.data.uid == userId
-             && request.resource.data.role == 'user'; // Users can only create 'user' roles for themselves
-    }
     function isUpdatingOwnProfile(userId) {
       return isOwner(userId)
              && request.resource.data.role == resource.data.role; // Role cannot be changed by the user
@@ -94,14 +89,14 @@ service cloud.firestore {
      * @description Controls access to user profile data.
      * @path /users/{userId}
      * @allow (get) A user can read their own profile, and admins can read any profile.
-     * @allow (create) A user can create their own profile.
+     * @allow (create) A user can create their own profile, with the UID matching their auth token.
      * @allow (update) A user can update their own profile, but cannot change their role.
      * @deny (delete) Users cannot delete their own profiles.
      */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
-      allow create: if isCreatingOwnProfile(userId) || isAdmin();
+      allow create: if isOwner(userId) && request.resource.data.uid == request.auth.uid;
       allow update: if isUpdatingOwnProfile(userId);
       allow delete: if isAdmin(); // Only admins can delete user profiles
     }
