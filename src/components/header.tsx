@@ -54,20 +54,20 @@ export function Header() {
           </Link>
         </div>
 
-        {/* Center Section: Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          {categories.map((cat) => (
-            <NavLinkWithDropdown key={cat.slug} category={cat} />
-          ))}
-          {otherNavLinks.map((link) => (
-            <Link key={link.slug} href={`/${link.slug}`} className="text-base font-medium text-foreground transition-colors hover:text-primary">
-              {link.name}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Right Section: Search and Contact */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Right Section: Nav, Search and Contact */}
+        <div className="hidden md:flex items-center gap-6">
+           {/* Desktop Navigation */}
+          <nav className="flex items-center space-x-6">
+            {categories.map((cat) => (
+              <NavLinkWithDropdown key={cat.slug} category={cat} />
+            ))}
+            {otherNavLinks.map((link) => (
+              <Link key={link.slug} href={`/${link.slug}`} className="text-base font-medium text-foreground transition-colors hover:text-primary">
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+          
            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
