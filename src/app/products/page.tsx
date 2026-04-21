@@ -4,15 +4,17 @@ import { ProductGrid } from '@/components/product-grid';
 import { ProductFilters } from '@/components/product-filters';
 import { useProducts } from '@/context/product-context';
 import { categories } from '@/lib/data';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ChevronLeft, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useUserProfile } from '@/firebase/auth/use-user-profile';
 
 export default function ProductsPage() {
   const { products } = useProducts();
+  const { isAdmin } = useUserProfile();
   const [activeCategory, setActiveCategory] = useState('all');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -48,6 +50,13 @@ export default function ProductsPage() {
                 Categories
               </h3>
               <div className="space-y-2">
+                <Button
+                  variant={activeCategory === 'all' ? "default" : "ghost"}
+                  className="w-full justify-start h-12 px-4 py-2 text-left hover:bg-slate-100 transition-all"
+                  onClick={() => setActiveCategory('all')}
+                >
+                  All ({products.length})
+                </Button>
                 {categories.map((category) => (
                   <Button
                     key={category.slug}
@@ -121,7 +130,7 @@ export default function ProductsPage() {
                   <p className="text-muted-foreground mb-8">
                     {activeCategory === 'all' ? 'No products available yet.' : `No ${activeCategory} products available.`}
                   </p>
-                  {useUserProfile().isAdmin && (
+                  {isAdmin && (
                     <Button asChild size="lg">
                       <Link href="/admin/products/new">
                         Add First Product
@@ -134,9 +143,6 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
-
-      {/* Mobile Filters Sheet */}
-      {/* Add mobile filters modal here if needed */}
     </div>
   );
 }
