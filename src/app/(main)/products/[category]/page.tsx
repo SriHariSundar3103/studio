@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { useProducts } from '@/context/product-context';
 import { categories } from '@/lib/data';
 import { ProductGrid } from '@/components/product-grid';
@@ -22,8 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 
-export default function CategoryPage({ params }: { params: { category: string } }) {
-  const { category } = params;
+export default function CategoryPage() {
+  const params = useParams();
+  const category = params.category as string;
   const { products } = useProducts();
 
   const currentCategory = categories.find(c => c.slug === category);

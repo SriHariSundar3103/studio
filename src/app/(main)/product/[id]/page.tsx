@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useProducts } from '@/context/product-context';
 import { businessDetails } from '@/lib/data';
@@ -22,13 +22,15 @@ import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
   const { getProductById } = useProducts();
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
 
   useEffect(() => {
-    setProduct(getProductById(params.id));
-  }, [params.id, getProductById]);
+    setProduct(getProductById(id));
+  }, [id, getProductById]);
 
   if (product === undefined) {
     return (
