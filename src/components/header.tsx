@@ -44,7 +44,7 @@ function NavLinkWithDropdown({ category }: { category: Category }) {
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white text-foreground h-[70px]">
-      <div className="container flex h-full items-center justify-between px-4 md:px-6">
+      <div className="container flex h-full items-center px-4 md:px-6">
         
         {/* Left Section: Logo */}
         <div className="flex items-center">
@@ -53,11 +53,9 @@ export function Header() {
             <span className="font-bold text-[22px] text-black">Hi/sky</span>
           </Link>
         </div>
-
-        {/* Right Section: Nav, Search and Contact */}
-        <div className="hidden md:flex items-center gap-6">
-           {/* Desktop Navigation */}
-          <nav className="flex items-center space-x-6">
+        
+        {/* Center Section: Nav */}
+        <nav className="hidden md:flex items-center space-x-6 ml-8">
             {categories.map((cat) => (
               <NavLinkWithDropdown key={cat.slug} category={cat} />
             ))}
@@ -66,8 +64,10 @@ export function Header() {
                 {link.name}
               </Link>
             ))}
-          </nav>
-          
+        </nav>
+
+        {/* Right Section: Nav, Search and Contact */}
+        <div className="hidden md:flex items-center gap-6 ml-auto">
            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -85,7 +85,7 @@ export function Header() {
         </div>
         
         {/* Mobile Nav Trigger */}
-        <div className="md:hidden">
+        <div className="md:hidden ml-auto">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
