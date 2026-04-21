@@ -116,7 +116,7 @@ export default function CategoryPage() {
       </div>
 
        <div className="flex items-baseline justify-between mb-8">
-        <p className="text-sm text-muted-foreground">{loading ? <Skeleton className="h-5 w-20" /> : `${sortedProducts.length} products`}</p>
+        <div className="text-sm text-muted-foreground">{loading ? <Skeleton className="h-5 w-20" /> : `${sortedProducts.length} products`}</div>
         <div className="flex items-center gap-4">
             <Select onValueChange={setSortBy} defaultValue="trending">
               <SelectTrigger className="w-[180px]">
