@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableHeader,
@@ -47,6 +48,7 @@ import { useToast } from '@/hooks/use-toast';
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDeleteProduct = (productId: string) => {
     setProducts((prevProducts) => prevProducts.filter((p) => p.id !== productId));
@@ -127,7 +129,9 @@ export default function AdminProductsPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => router.push(`/admin/products/${product.id}/edit`)}>
+                              Edit
+                            </DropdownMenuItem>
                              <AlertDialogTrigger asChild>
                                 <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
                              </AlertDialogTrigger>
