@@ -25,15 +25,32 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "The timestamp when the product was created." }
       },
       "required": ["name", "category", "productType", "price", "stockStatus", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user profile information, including their role.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The user's unique ID." },
+        "email": { "type": "string", "description": "The user's email address." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "photoURL": { "type": "string", "description": "URL of the user's profile picture." },
+        "role": { "type": "string", "enum": ["admin", "user"], "description": "The user's role in the application." }
+      },
+      "required": ["uid", "email", "role"]
     }
   },
   "auth": {
-    "providers": []
+    "providers": ["Google"]
   },
   "firestore": {
     "/products/{productId}": {
       "schema": { "$ref": "#/entities/Product" },
       "description": "Contains all product listings for the store."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores user profile information."
     }
   }
 }

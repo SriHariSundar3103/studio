@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, Package, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -14,6 +14,9 @@ import {
 import { cn } from '@/lib/utils';
 import { businessDetails } from '@/lib/data';
 import { Icons } from '@/components/icons';
+import { useUserProfile } from '@/firebase/auth/use-user-profile';
+import { useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const navLinks = [
   { href: '/admin/dashboard', icon: Home, label: 'Dashboard' },
@@ -26,6 +29,25 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAdmin, loading } = useUserProfile();
+
+  useEffect(() => {
+    if (!loading && !isAdmin) {
+      router.replace('/');
+    }
+  }, [isAdmin, loading, router]);
+
+  if (loading || !isAdmin) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Icons.Logo className="h-12 w-12 animate-pulse" />
+          <p className="text-muted-foreground">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
 
   const desktopNav = (
     <nav className="hidden md:flex md:flex-col md:items-center md:gap-4 md:px-2 md:py-4">

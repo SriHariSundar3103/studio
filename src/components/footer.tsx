@@ -1,7 +1,27 @@
+'use client';
+
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { businessDetails, categories } from '@/lib/data';
 import { Github, Twitter, Instagram } from 'lucide-react';
+import { useUserProfile } from '@/firebase/auth/use-user-profile';
+
+function AdminFooterLink() {
+  const { isAdmin, loading } = useUserProfile();
+
+  if (loading || !isAdmin) {
+    return null;
+  }
+
+  return (
+    <li>
+      <Link href="/admin" className="text-sm text-gray-300 hover:text-white transition-colors">
+        Admin
+      </Link>
+    </li>
+  );
+}
+
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -46,11 +66,7 @@ export function Footer() {
                   Contact Us
                 </Link>
               </li>
-               <li>
-                <Link href="/admin" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Admin
-                </Link>
-              </li>
+               <AdminFooterLink />
             </ul>
           </div>
 
