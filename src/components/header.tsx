@@ -72,8 +72,8 @@ export function Header() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search watches, shirts, pants..."
-                className="w-[250px] h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
+                placeholder="Search products..."
+                className="w-[200px] focus:w-[280px] transition-all duration-300 ease-in-out h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
               />
             </div>
            <Button asChild className="h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90">
