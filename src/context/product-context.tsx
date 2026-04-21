@@ -3,7 +3,7 @@
 import { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { products as initialProducts } from '@/lib/data';
 import type { Product } from '@/lib/types';
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore, useCollection, useUserProfile } from '@/firebase';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs, writeBatch, query } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -23,8 +23,9 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
   const db = useFirestore();
+  const { isAdmin, loading: isAdminLoading } = useUserProfile();
   const productsQuery = useMemo(() => db ? query(collection(db, 'products')) : null, [db]);
-  const { data: productsData, loading } = useCollection<Product>(productsQuery);
+  const { data: productsData, loading: productsLoading } = useCollection<Product>(productsQuery);
 
   const products = useMemo(() => (productsData || []).map(p => ({
     ...p,
@@ -33,27 +34,34 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   })).sort((a, b) => (b.createdAt as any) - (a.createdAt as any)), [productsData]);
 
 
-  // Seed the database with initial products if it's empty
+  // Seed the database with initial products if it's empty, but only for admins.
   useEffect(() => {
     const seedDatabase = async () => {
-      if (!db || products.length > 0 || loading) return;
+      if (!db || products.length > 0 || productsLoading || isAdminLoading || !isAdmin) return;
       
       const productsRef = collection(db, "products");
       const snapshot = await getDocs(productsRef);
       
       if (snapshot.empty) {
-        console.log('Seeding database with initial products...');
+        console.log('Admin user detected. Seeding database with initial products...');
         const batch = writeBatch(db);
         initialProducts.forEach((product) => {
           const docRef = doc(productsRef, product.id);
           batch.set(docRef, { ...product, createdAt: serverTimestamp() });
         });
-        await batch.commit();
+        batch.commit().catch(async (serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: productsRef.path,
+            operation: 'create',
+            requestResourceData: { note: `Seeding ${initialProducts.length} initial products.` }
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        });
       }
     };
 
     seedDatabase();
-  }, [db, products.length, loading]);
+  }, [db, products.length, productsLoading, isAdmin, isAdminLoading]);
 
 
   const addProduct = useCallback(async (productData: NewProductData) => {
@@ -112,12 +120,12 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   
   const value = useMemo(() => ({ 
     products, 
-    loading, 
+    loading: productsLoading || isAdminLoading, 
     addProduct, 
     updateProduct, 
     deleteProduct, 
     getProductById 
-  }), [products, loading, addProduct, updateProduct, deleteProduct, getProductById]);
+  }), [products, productsLoading, isAdminLoading, addProduct, updateProduct, deleteProduct, getProductById]);
 
   return (
     <ProductContext.Provider value={value}>
