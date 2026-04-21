@@ -10,16 +10,18 @@ import { businessDetails } from '@/lib/data';
 
 interface ProductCardProps {
   product: Product;
+  fromSearch?: string;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, fromSearch }: ProductCardProps) {
   const placeholderImage = PlaceHolderImages.find(img => img.id === product.images[0]);
+  const productUrl = `/product/${product.id}${fromSearch ? `?from_search=${encodeURIComponent(fromSearch)}` : ''}`;
 
   return (
     <Card className="h-full overflow-hidden transition-all duration-300 group rounded-lg border hover:shadow-lg hover:-translate-y-1 flex flex-col">
       <CardContent className="p-0 relative">
         <div className="relative aspect-square">
-          <Link href={`/product/${product.id}`} className="block w-full h-full">
+          <Link href={productUrl} className="block w-full h-full">
             {placeholderImage && (
               <Image
                 src={placeholderImage.imageUrl}
@@ -54,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </CardContent>
       <div className="p-4 space-y-2 flex flex-col flex-grow bg-card">
         <h3 className="text-base font-medium tracking-tight">
-            <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
+            <Link href={productUrl} className="hover:text-primary transition-colors">
                 {product.name}
             </Link>
         </h3>

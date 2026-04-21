@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useProducts } from '@/context/product-context';
 import { businessDetails } from '@/lib/data';
@@ -24,9 +24,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
   const { getProductById } = useProducts();
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
+  const fromSearch = searchParams.get('from_search');
 
   useEffect(() => {
     setProduct(getProductById(id));
@@ -66,22 +68,40 @@ export default function ProductDetailPage() {
 
   const productImages = product.images.map(id => PlaceHolderImages.find(img => img.id === id)).filter(Boolean);
 
+  const breadcrumbContent = fromSearch ? (
+    <BreadcrumbList>
+      <BreadcrumbItem>
+        <BreadcrumbLink href="/">Home</BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink href={`/search?q=${encodeURIComponent(fromSearch)}`}>Search Results</BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>{product.name}</BreadcrumbPage>
+      </BreadcrumbItem>
+    </BreadcrumbList>
+  ) : (
+    <BreadcrumbList>
+      <BreadcrumbItem>
+        <BreadcrumbLink href="/">Home</BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink href={`/products/${product.category.toLowerCase()}`}>{product.category === 'Men' ? "Men's Collection" : `${product.category} Watches`}</BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>{product.name}</BreadcrumbPage>
+      </BreadcrumbItem>
+    </BreadcrumbList>
+  );
+
   return (
     <div className="container py-8 md:py-12 bg-background">
       <Breadcrumb className="mb-8">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/products/${product.category.toLowerCase()}`}>{product.category === 'Men' ? "Men's Collection" : `${product.category} Watches`}</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{product.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
+        {breadcrumbContent}
       </Breadcrumb>
       
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">

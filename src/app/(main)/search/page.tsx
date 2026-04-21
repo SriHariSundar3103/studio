@@ -48,7 +48,7 @@ export default function SearchPage() {
             {query ? `${filteredProducts.length} results for "${query}"` : 'Please enter a search term'}
           </h1>
           {filteredProducts.length > 0 ? (
-            <ProductGrid products={filteredProducts} />
+            <ProductGrid products={filteredProducts} fromSearch={query || undefined} />
           ) : (
             <p className="text-muted-foreground">
               No products found matching your search. Try a different term.
