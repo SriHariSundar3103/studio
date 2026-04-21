@@ -37,6 +37,7 @@ service cloud.firestore {
     // Helper Functions
     // ----------------------------------------------------------------------
     function isSignedIn() { return request.auth != null; }
+    function isBootstrapAdmin() { return request.auth.token.email == 'sri352006@gmail.com'; }
     function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)); }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
     function isExistingOwner(userId) { return isOwner(userId) && resource != null; }
@@ -50,6 +51,11 @@ service cloud.firestore {
     function isUpdatingOwnProfile(userId) {
       return isOwner(userId)
              && request.resource.data.role == resource.data.role; // Role cannot be changed by the user
+    }
+    
+    function isCreatingOwnProfile(userId) {
+      return isOwner(userId)
+             && request.resource.data.uid == request.auth.uid;
     }
 
     // ----------------------------------------------------------------------
@@ -96,7 +102,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
-      allow create: if isOwner(userId) && request.resource.data.uid == request.auth.uid;
+      allow create: if isCreatingOwnProfile(userId);
       allow update: if isUpdatingOwnProfile(userId);
       allow delete: if isAdmin(); // Only admins can delete user profiles
     }
@@ -121,7 +127,8 @@ service cloud.firestore {
      * @path /roles_admin/{userId}
      */
     match /roles_admin/{userId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin() || isOwner(userId);
+      allow write: if isAdmin() || isBootstrapAdmin();
     }
   }
 }
