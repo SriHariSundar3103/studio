@@ -10,7 +10,7 @@ function SecondaryNav() {
         <div className="flex items-center space-x-8 text-sm font-medium">
           {categories.map((link) => (
             <Link
-              key={link.href}
+              key={link.slug}
               href={`/products/${link.slug}`}
               className="text-foreground/80 transition-colors hover:text-foreground"
             >
