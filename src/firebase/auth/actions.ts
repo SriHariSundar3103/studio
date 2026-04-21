@@ -5,7 +5,7 @@ import {
   signOut as firebaseSignOut,
   type User,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, type Firestore, writeBatch } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
 import { initializeFirebase } from '@/firebase';
 
@@ -18,7 +18,9 @@ async function getOrCreateUserProfile(db: Firestore, user: User): Promise<UserPr
   if (userSnap.exists()) {
     return userSnap.data() as UserProfile;
   } else {
+    const batch = writeBatch(db);
     const role = ADMIN_EMAILS.includes(user.email || '') ? 'admin' : 'user';
+    
     const newUserProfile: UserProfile = {
       uid: user.uid,
       email: user.email,
@@ -26,7 +28,15 @@ async function getOrCreateUserProfile(db: Firestore, user: User): Promise<UserPr
       photoURL: user.photoURL,
       role: role,
     };
-    await setDoc(userRef, { ...newUserProfile, createdAt: serverTimestamp() });
+    
+    batch.set(userRef, { ...newUserProfile, createdAt: serverTimestamp() });
+
+    if (role === 'admin') {
+      const adminRoleRef = doc(db, 'roles_admin', user.uid);
+      batch.set(adminRoleRef, { role: 'admin' });
+    }
+
+    await batch.commit();
     return newUserProfile;
   }
 }

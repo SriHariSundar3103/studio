@@ -1,17 +1,14 @@
 'use client';
 
-import { useUser } from '@/firebase';
-import { useDoc } from '@/firebase';
+import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { useMemo } from 'react';
 import type { UserProfile } from '@/lib/types';
 
 export function useUserProfile() {
   const { user, loading: userLoading } = useUser();
   const db = useFirestore();
 
-  const userProfileRef = useMemo(() => {
+  const userProfileRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, 'users', user.uid) as any;
   }, [db, user]);

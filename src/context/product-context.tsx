@@ -3,7 +3,8 @@
 import { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { products as initialProducts } from '@/lib/data';
 import type { Product } from '@/lib/types';
-import { useFirestore, useCollection, useUserProfile } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUserProfile } from '@/firebase/auth/use-user-profile';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs, writeBatch, query } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -24,7 +25,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 export function ProductProvider({ children }: { children: ReactNode }) {
   const db = useFirestore();
   const { isAdmin, loading: isAdminLoading } = useUserProfile();
-  const productsQuery = useMemo(() => db ? query(collection(db, 'products')) : null, [db]);
+  const productsQuery = useMemoFirebase(() => db ? query(collection(db, 'products')) : null, [db]);
   const { data: productsData, loading: productsLoading } = useCollection<Product>(productsQuery);
 
   const products = useMemo(() => (productsData || []).map(p => ({

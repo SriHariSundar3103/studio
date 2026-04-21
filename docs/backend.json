@@ -333,12 +333,73 @@
         "gpayEmail",
         "gpayNumber"
       ]
+    },
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Stores profile information for a user, including their role.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID from Firebase Auth."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role, either 'admin' or 'user'.",
+          "enum": [
+            "admin",
+            "user"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "uid",
+        "email",
+        "role",
+        "createdAt"
+      ]
+    },
+    "UserRole": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserRole",
+      "type": "object",
+      "description": "Defines an administrative role for a user. The existence of a document for a user in the roles_admin collection grants admin privileges.",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "admin"
+          ]
+        }
+      },
+      "required": [
+        "role"
+      ]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "google.com"
     ]
   },
   "firestore": {
@@ -451,6 +512,22 @@
         }
       },
       {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information, including their role. A user can read/write their own profile. Admins can read any profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The user's unique ID."
+            }
+          ]
+        }
+      },
+      {
         "path": "/roles_admin/{userId}",
         "definition": {
           "entityName": "UserRole",
@@ -467,6 +544,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed following the core principles of Authorization Independence, Structural Segregation, and Access Modeling to ensure robust security and debuggability. All public-facing entities such as Products, Categories, Images, Tags, Hero Banners, and Shop Settings are placed in top-level collections (e.g., `/products/{productId}`). These collections are designed for public read access and admin-only write access, ensuring a homogeneous security posture (Structural Segregation).\n\n**Authorization Independence via Denormalization:**\n*   **Wishlists:** To ensure atomic operations and avoid `get()` calls in security rules, each user's wishlist is stored at `/wishlists/{userId}`. The `Wishlist` document itself contains the `userId` field. This denormalization allows security rules to directly compare `request.auth.uid` with `resource.data.userId` for read/write operations without needing to fetch additional user data, thus achieving Authorization Independence. This structure also supports **QAPs (Query/Access Patterns)**, as a user can only query their specific wishlist document using `request.auth.uid`, making `list` operations secure by default (as `list` on `/wishlists` would require `where('userId', '==', request.auth.uid)` which is inherently restricted to the authenticated user's ID by the rules).\n*   **Admin Roles:** Administrative access is managed through a dedicated `/roles_admin/{userId}` collection. The mere existence of a document at `/roles_admin/{request.auth.uid}` grants admin privileges. This employs the 'Existence over Content' pattern for Global Roles (DBAC), enabling security rules to check for admin status with a simple `get(/roles_admin/$(request.auth.uid))` or `exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))` without complex lookups or custom claims. This directly supports Authorization Independence as admin status is stored in a predictable, dedicated location.\n\n**QAPs (Rules are not Filters):**\n*   For public collections like `/products`, `/categories`, `/heroBanners`, etc., the rules will permit `list` operations for all users, as these are publicly viewable. The structure does not mix public and private data, so no filtering is needed within rules for these collections.\n*   For `/wishlists/{userId}`, `list` operations (though typically `get` on a specific document by UID is more common for a 1:1 user-wishlist relationship) are secured by path-based ownership. If a `list` query is performed, it must include a `where('userId', '==', request.auth.uid)` clause, which the security rules will enforce, preventing unauthorized users from listing other users' wishlists.\n\n**Note on Firebase Error:** The `FirebaseError: Firebase: Error (auth/configuration-not-found)` message reported in the user request is a client-side error related to the Firebase SDK initialization (e.g., missing or incorrect `firebaseConfig` when calling `initializeApp`). This is separate from Firestore data structure design and security rules, and would need to be addressed in the client-side code configuration."
+    "reasoning": "The Firestore structure is designed to support the application's features, including role-based access control. The '/users/{userId}' collection is added to store user profiles, which includes a 'role' field. This is crucial for distinguishing between regular users and administrators. Security rules will be configured to protect this data, allowing users to manage their own profiles while giving admins appropriate oversight. The '/roles_admin' collection is maintained for a quick and efficient way to check for admin privileges within security rules using `exists()`. Auth providers are updated to 'google.com' to match the new login system. This addresses the `(auth/configuration-not-found)` error by correctly defining the data structure needed by the application's authentication and authorization logic."
   }
 }
