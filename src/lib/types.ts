@@ -12,6 +12,7 @@ export type Product = {
   isDealOfTheDay: boolean;
   rating: number;
   reviewCount: number;
+  viewCount: number;
   color: string;
   sizes?: string[];
   fit?: string;
@@ -60,3 +61,11 @@ export type UserProfile = {
   photoURL: string | null;
   role: 'admin' | 'user';
 };
+
+export type Image = {
+  id: string;
+  url: string;
+  altText: string;
+  createdAt?: { seconds: number; nanoseconds: number; } | Date;
+};
+    

@@ -1,22 +1,22 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useProducts } from '@/context/product-context';
 
 export function HeroBanner() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-banner');
+  const { images } = useProducts();
+  const heroImage = images.find(img => img.id === 'hero-banner');
 
   return (
     <section className="relative w-full h-[400px]">
       {heroImage && (
          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
+            src={heroImage.url}
+            alt={heroImage.altText}
             fill
             className="object-cover"
             priority
-            data-ai-hint={heroImage.imageHint}
           />
       )}
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20" />
@@ -36,3 +36,5 @@ export function HeroBanner() {
     </section>
   );
 }
+
+    

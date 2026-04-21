@@ -1,12 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import type { Product, Image as ImageType } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Heart, Eye, Phone } from 'lucide-react';
 import { businessDetails } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
 
 interface ProductCardProps {
   product: Product;
@@ -14,7 +14,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, fromSearch }: ProductCardProps) {
-  const placeholderImage = PlaceHolderImages.find(img => img.id === product.images[0]);
+  const { images } = useProducts();
+  const productImage = images.find(img => img.id === product.images[0]);
   const productUrl = `/product/${product.id}${fromSearch ? `?from_search=${encodeURIComponent(fromSearch)}` : ''}`;
 
   return (
@@ -22,13 +23,12 @@ export function ProductCard({ product, fromSearch }: ProductCardProps) {
       <CardContent className="p-0 relative">
         <div className="relative aspect-square">
           <Link href={productUrl} className="block w-full h-full">
-            {placeholderImage && (
+            {productImage && (
               <Image
-                src={placeholderImage.imageUrl}
+                src={productImage.url}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={placeholderImage.imageHint}
               />
             )}
           </Link>
@@ -80,3 +80,5 @@ export function ProductCard({ product, fromSearch }: ProductCardProps) {
     </Card>
   );
 }
+
+    

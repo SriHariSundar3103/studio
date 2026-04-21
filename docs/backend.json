@@ -30,6 +30,10 @@
           "type": "boolean",
           "description": "Indicates if the product is currently trending and should be highlighted."
         },
+        "viewCount": {
+          "type": "number",
+          "description": "The number of times the product page has been viewed."
+        },
         "style": {
           "type": "string",
           "description": "The style of the watch (e.g., 'Casual', 'Formal', 'Sports'). Used for recommendations and filters."
@@ -547,3 +551,4 @@
     "reasoning": "The Firestore structure is designed to support the application's features, including role-based access control. The '/users/{userId}' collection is added to store user profiles, which includes a 'role' field. This is crucial for distinguishing between regular users and administrators. Security rules will be configured to protect this data, allowing users to manage their own profiles while giving admins appropriate oversight. The '/roles_admin' collection is maintained for a quick and efficient way to check for admin privileges within security rules using `exists()`. Auth providers are updated to 'google.com' to match the new login system. This addresses the `(auth/configuration-not-found)` error by correctly defining the data structure needed by the application's authentication and authorization logic."
   }
 }
+    

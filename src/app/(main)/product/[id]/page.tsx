@@ -4,7 +4,6 @@ import { notFound, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useProducts } from '@/context/product-context';
 import { businessDetails } from '@/lib/data';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,21 +17,37 @@ import { Badge } from '@/components/ui/badge';
 import { Star, CheckCircle, Phone, Heart } from 'lucide-react';
 import { ProductRecommendations } from '@/components/product-recommendations';
 import { Separator } from '@/components/ui/separator';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Image as ImageType } from '@/lib/types';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params.id as string;
-  const { getProductById } = useProducts();
+  const { getProductById, updateProduct, images } = useProducts();
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
   const fromSearch = searchParams.get('from_search');
+  const lastViewedId = useRef<string | null>(null);
 
   useEffect(() => {
-    setProduct(getProductById(id));
-  }, [id, getProductById]);
+    const currentProduct = getProductById(id);
+    setProduct(currentProduct);
+
+    if (currentProduct && lastViewedId.current !== id) {
+        lastViewedId.current = id;
+        const newViewCount = (currentProduct.viewCount || 0) + 1;
+        const updates: Partial<Product> = { viewCount: newViewCount };
+
+        const TRENDING_THRESHOLD = 10;
+        if (newViewCount >= TRENDING_THRESHOLD && !currentProduct.isTrending) {
+            updates.isTrending = true;
+        }
+        
+        updateProduct(id, updates);
+    }
+  }, [id, getProductById, updateProduct]);
 
   if (product === undefined) {
     return (
@@ -66,7 +81,9 @@ export default function ProductDetailPage() {
     notFound();
   }
 
-  const productImages = product.images.map(id => PlaceHolderImages.find(img => img.id === id)).filter(Boolean);
+  const getProductImage = (id: string): ImageType | undefined => images.find(img => img.id === id);
+
+  const productImages = product.images.map(id => getProductImage(id)).filter(Boolean) as ImageType[];
 
   const breadcrumbContent = fromSearch ? (
     <BreadcrumbList>
@@ -110,24 +127,22 @@ export default function ProductDetailPage() {
           <div className="relative aspect-square overflow-hidden rounded-lg border">
             {productImages[0] && (
               <Image
-                src={productImages[0].imageUrl}
+                src={productImages[0].url}
                 alt={product.name}
                 fill
                 className="object-cover"
-                data-ai-hint={productImages[0].imageHint}
               />
             )}
           </div>
           <div className="grid grid-cols-3 gap-4">
-            {productImages.slice(1).map((img, index) => (
+            {productImages.slice(1, 3).map((img, index) => (
               <div key={index} className="relative aspect-square overflow-hidden rounded-lg border">
                 {img && (
                   <Image
-                    src={img.imageUrl}
+                    src={img.url}
                     alt={`${product.name} view ${index + 2}`}
                     fill
                     className="object-cover"
-                    data-ai-hint={img.imageHint}
                   />
                 )}
               </div>
@@ -186,3 +201,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+    

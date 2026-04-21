@@ -20,7 +20,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useProducts } from '@/context/product-context';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
@@ -45,7 +44,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminProductsPage() {
-  const { products, deleteProduct, loading } = useProducts();
+  const { products, deleteProduct, loading, images } = useProducts();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -124,7 +123,7 @@ export default function AdminProductsPage() {
             </TableHeader>
             <TableBody>
               {products.map((product) => {
-                const image = PlaceHolderImages.find(
+                const image = images.find(
                   (img) => img.id === product.images[0]
                 );
                 return (
@@ -135,7 +134,7 @@ export default function AdminProductsPage() {
                           alt={product.name}
                           className="aspect-square rounded-md object-cover"
                           height="64"
-                          src={image.imageUrl}
+                          src={image.url}
                           width="64"
                         />
                       )}
@@ -192,3 +191,5 @@ export default function AdminProductsPage() {
     </Card>
   );
 }
+
+    

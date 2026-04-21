@@ -74,6 +74,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.5,
     reviewCount: 120,
+    viewCount: 0,
     strap: 'Leather',
     color: 'Silver'
   },
@@ -90,6 +91,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: true,
     rating: 4.7,
     reviewCount: 250,
+    viewCount: 0,
     strap: 'Stainless Steel',
     color: 'Silver'
   },
@@ -106,6 +108,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.8,
     reviewCount: 180,
+    viewCount: 0,
     strap: 'Leather',
     color: 'Rose Gold'
   },
@@ -122,6 +125,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.6,
     reviewCount: 95,
+    viewCount: 0,
     strap: 'Metal',
     color: 'Silver'
   },
@@ -138,6 +142,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: true,
     rating: 4.9,
     reviewCount: 300,
+    viewCount: 0,
     strap: 'Silicone',
     color: 'Blue'
   },
@@ -154,6 +159,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.4,
     reviewCount: 88,
+    viewCount: 0,
     strap: 'Silicone',
     color: 'Black'
   },
@@ -170,6 +176,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.7,
     reviewCount: 150,
+    viewCount: 0,
     strap: 'Mesh',
     color: 'Gold'
   },
@@ -186,6 +193,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.9,
     reviewCount: 412,
+    viewCount: 0,
     strap: 'Fabric',
     color: 'Pink'
   },
@@ -203,6 +211,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.6,
     reviewCount: 92,
+    viewCount: 0,
     color: 'White',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     fit: 'Regular Fit',
@@ -222,6 +231,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.7,
     reviewCount: 115,
+    viewCount: 0,
     color: 'Khaki',
     sizes: ['30', '32', '34', '36', '38'],
     fit: 'Slim'
@@ -240,6 +250,7 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.5,
     reviewCount: 78,
+    viewCount: 0,
     color: 'Blue',
     sizes: ['M', 'L', 'XL'],
     fit: 'Slim Fit',
@@ -259,8 +270,11 @@ export const products: Omit<Product, 'id'>[] = [
     isDealOfTheDay: false,
     rating: 4.8,
     reviewCount: 210,
+    viewCount: 0,
     color: 'Blue',
     sizes: ['30', '32', '34', '36', '38'],
     fit: 'Regular'
   }
 ].map(p => ({ ...p, id: p.id || `hsk-auto-${Math.random().toString(36).substr(2, 9)}` })) as Product[];
+
+    

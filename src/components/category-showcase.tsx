@@ -1,26 +1,27 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { categories } from '@/lib/data';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
+import { useProducts } from '@/context/product-context';
 
 export function CategoryShowcase() {
+  const { images } = useProducts();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {categories.map((category) => {
-        const categoryImage = PlaceHolderImages.find(img => img.id === category.image);
+        const categoryImage = images.find(img => img.id === category.image);
         return (
           <Link href={`/products/${category.slug}`} key={category.slug} className="group block">
             <Card className="relative overflow-hidden h-full transition-all duration-300 hover:shadow-xl">
               {categoryImage && (
                 <Image
-                  src={categoryImage.imageUrl}
+                  src={categoryImage.url}
                   alt={category.name}
                   width={600}
                   height={400}
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                  data-ai-hint={categoryImage.imageHint}
                 />
               )}
                <div className="absolute inset-0 bg-black/40" />
@@ -39,3 +40,5 @@ export function CategoryShowcase() {
     </div>
   );
 }
+
+    
