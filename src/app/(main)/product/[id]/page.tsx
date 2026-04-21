@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
   const productImages = product.images.map(id => PlaceHolderImages.find(img => img.id === id)).filter(Boolean);
 
   return (
-    <div className="container py-8 md:py-12">
+    <div className="container py-8 md:py-12 bg-background">
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -87,7 +87,7 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         {/* Image Gallery */}
         <div className="grid gap-4">
-          <div className="relative aspect-square overflow-hidden rounded-lg">
+          <div className="relative aspect-square overflow-hidden rounded-lg border">
             {productImages[0] && (
               <Image
                 src={productImages[0].imageUrl}
@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{product.name}</h1>
             <div className="mt-2 flex items-center gap-4">
                 <div className="flex items-center gap-1">
-                    <Star className="w-5 h-5 fill-accent text-accent" />
+                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold">{product.rating}</span>
                     <span className="text-sm text-muted-foreground">({product.reviewCount} reviews)</span>
                 </div>
@@ -132,7 +132,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <p className="text-4xl font-bold">₹{product.price.toLocaleString()}</p>
+          <p className="text-4xl font-bold text-[#B12704]">₹{product.price.toLocaleString()}</p>
           
           <div className="flex items-center gap-2">
             <CheckCircle className={`w-5 h-5 ${product.stockStatus === 'Available' ? 'text-green-600' : 'text-red-600'}`} />
@@ -149,7 +149,7 @@ export default function ProductDetailPage() {
                 <Phone className="mr-2 h-5 w-5" /> Call Now to Order
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="flex-1 border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+            <Button size="lg" variant="secondary" className="flex-1">
               Order via GPay
             </Button>
              <Button size="lg" variant="outline" className="px-4">

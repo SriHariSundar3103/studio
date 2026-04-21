@@ -16,7 +16,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const placeholderImage = PlaceHolderImages.find(img => img.id === product.images[0]);
 
   return (
-    <Card className="h-full overflow-hidden transition-all duration-200 group hover:shadow-xl flex flex-col">
+    <Card className="h-full overflow-hidden transition-all duration-300 group rounded-lg border hover:shadow-lg hover:-translate-y-1 flex flex-col">
       <CardContent className="p-0 relative">
         <div className="relative aspect-square">
           <Link href={`/product/${product.id}`} className="block w-full h-full">
@@ -33,10 +33,10 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none"></div>
           <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
             {product.isTrending && (
-              <Badge variant="default" className="bg-accent text-accent-foreground">Trending</Badge>
+              <Badge className="bg-[#CC0C39] text-white hover:bg-[#CC0C39]">Trending</Badge>
             )}
             {product.isDealOfTheDay && (
-              <Badge variant="destructive">Deal</Badge>
+              <Badge className="bg-[#FFA41C] text-black hover:bg-[#FFA41C]">Best Seller</Badge>
             )}
           </div>
           
@@ -52,18 +52,18 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
       </CardContent>
-      <div className="p-4 space-y-2 flex flex-col flex-grow">
-        <h3 className="text-lg font-semibold tracking-tight">
+      <div className="p-4 space-y-2 flex flex-col flex-grow bg-card">
+        <h3 className="text-base font-medium tracking-tight">
             <Link href={`/product/${product.id}`} className="hover:text-primary transition-colors">
                 {product.name}
             </Link>
         </h3>
-        <p className="text-sm text-muted-foreground">{product.category}</p>
+        <p className="text-xs text-muted-foreground">{product.category}</p>
         <div className="flex-grow"></div>
         <div className="flex items-center justify-between pt-2">
           <p className="text-xl font-bold">₹{product.price.toLocaleString()}</p>
           <div className="flex items-center gap-1 text-sm">
-            <Star className="w-4 h-4 fill-accent text-accent" />
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span>{product.rating}</span>
             <span className="text-muted-foreground">({product.reviewCount})</span>
           </div>

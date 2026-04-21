@@ -27,7 +27,7 @@ export function HeroBanner() {
         <p className="mt-4 max-w-xl text-lg text-neutral-200">
           Discover our exclusive collection of watches that blend classic design with cutting-edge technology.
         </p>
-        <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
+        <Button asChild size="lg" className="mt-8">
           <Link href="/products/men">
             Shop Now <ArrowRight className="ml-2 h-5 w-5" />
           </Link>

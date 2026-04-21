@@ -92,7 +92,7 @@ export default function CategoryPage() {
   );
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 bg-background">
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -114,7 +114,7 @@ export default function CategoryPage() {
       <div className="border-b pb-4 mb-8">
         {isWomenCategory ? (
           <div className='text-center'>
-            <h1 className="text-4xl font-bold tracking-tight text-primary">Women's Watches Collection</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Women's Watches Collection</h1>
             <p className="mt-2 text-lg text-muted-foreground">Elegant and trendy watches for every occasion</p>
           </div>
         ) : (
@@ -127,7 +127,7 @@ export default function CategoryPage() {
 
       {isMenCategory && (
         <Tabs defaultValue={activeSubCategory} onValueChange={setActiveSubCategory} className="w-full mb-8">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 border-b">
                 {menSubCategories.map(sub => (
                     <TabsTrigger key={sub.slug} value={sub.slug}>{sub.name}</TabsTrigger>
                 ))}

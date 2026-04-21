@@ -243,9 +243,9 @@ export function ProductFilters({ category, subCategory }: ProductFiltersProps) {
   )
 
   return (
-    <Card>
+    <Card className="bg-background border-none shadow-none">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-base">
           Filters
           <Button variant="ghost" size="sm">
             <X className="w-4 h-4 mr-1" />
