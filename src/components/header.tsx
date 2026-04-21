@@ -6,7 +6,7 @@ import { Menu, Search, Phone, ChevronDown, LogOut, LayoutDashboard } from "lucid
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Dialog,
@@ -207,6 +207,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="bg-white text-foreground w-[300px] sm:w-[350px]">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
                <Link href="/" className="mr-6 flex items-center space-x-2 mb-6">
                   <Icons.Logo className="h-6 w-6" />
                   <span className="font-bold">Hi/sky</span>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Package, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   Tooltip,
   TooltipContent,
@@ -88,7 +88,8 @@ export default function AdminLayout({
             <span className="sr-only">Toggle Menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
+<SheetContent side="left" className="sm:max-w-xs">
+          <SheetTitle className="sr-only">Admin menu</SheetTitle>
           <nav className="grid gap-6 text-lg font-medium">
             <Link
               href="/"
