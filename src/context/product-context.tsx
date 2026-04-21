@@ -1,135 +1,90 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
-import type { Product, Image as ImageType } from '@/lib/types';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { useUserProfile } from '@/firebase/auth/use-user-profile';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query } from 'firebase/firestore';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
+import type { Product } from '@/lib/types';
+import { useUser } from '@/firebase/auth/use-user';
+import { categories } from '@/lib/data';
 
-export type NewProductData = Omit<Product, 'id' | 'isTrending' | 'isDealOfTheDay' | 'rating' | 'reviewCount' | 'createdAt' | 'viewCount'>;
-export type NewImageData = Omit<ImageType, 'id' | 'createdAt'>;
-
-interface ProductContextType {
-  products: Product[];
-  images: ImageType[];
-  loading: boolean;
-  addProduct: (productData: NewProductData) => Promise<void>;
-  updateProduct: (productId: string, productData: Partial<Product>) => Promise<void>;
-  deleteProduct: (productId: string) => Promise<void>;
-  getProductById: (productId: string) => Product | undefined;
-  addImage: (imageData: NewImageData) => Promise<void>;
-}
-
-const ProductContext = createContext<ProductContextType | undefined>(undefined);
+const ProductContext = createContext({
+  products: [] as Product[],
+  loading: false,
+  addProduct: async () => {},
+  updateProduct: async () => {},
+  deleteProduct: async () => {},
+getProductById: (id: string) => undefined as Product | undefined,
+} as any);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const db = useFirestore();
-  const { isAdmin, loading: isAdminLoading } = useUserProfile();
-  
-  const productsQuery = useMemoFirebase(() => db ? query(collection(db, 'products')) : null, [db]);
-  const { data: productsData, loading: productsLoading } = useCollection<Product>(productsQuery);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { user } = useUser();
+  const isAdmin = user?.email === 'admin@example.com'; // Mock
 
-  const imagesQuery = useMemoFirebase(() => db ? query(collection(db, 'images')) : null, [db]);
-  const { data: imagesData, loading: imagesLoading } = useCollection<ImageType>(imagesQuery);
+  useEffect(() => {
+    // Demo products
+    const demoProducts: Product[] = [
+      {
+        id: '1',
+        name: 'Demo Watch 1',
+        category: 'Men',
+        productType: 'watch',
+        price: 4999,
+        images: ['hsk-m-001-1'],
+        description: 'Demo product - local state only',
+        stockStatus: 'Available',
+        tags: ['demo'],
+        isTrending: true,
+        isDealOfTheDay: false,
+        rating: 4.5,
+        reviewCount: 10,
+        viewCount: 100,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+    setProducts(demoProducts);
+  }, []);
 
-  const products = useMemo(() => (productsData || []).map(p => ({
-    ...p,
-    createdAt: (p.createdAt as any)?.toDate ? (p.createdAt as any).toDate() : p.createdAt,
-  })).sort((a, b) => (b.createdAt as any) - (a.createdAt as any)), [productsData]);
-
-  const images = useMemo(() => (imagesData || []).map(i => ({
-    ...i,
-    createdAt: (i.createdAt as any)?.toDate ? (i.createdAt as any).toDate() : i.createdAt,
-  })), [imagesData]);
-
-  // Seeding removed - only admin uploads allowed
-
-  const addProduct = useCallback(async (productData: NewProductData) => {
-    if (!db || !isAdmin) return;
-    const newProduct: Omit<Product, 'id' | 'createdAt'> = {
+  const addProduct = async (productData: any) => {
+    if (!isAdmin) return;
+    setLoading(true);
+    const newProduct: Product = {
+      ...productData,
+      id: `demo-${Date.now()}`,
       isTrending: false,
       isDealOfTheDay: false,
-      rating: 4.5,
+      rating: 4.0,
       reviewCount: 0,
       viewCount: 0,
-      ...productData,
+      createdAt: new Date().toISOString(),
     };
-    const productsRef = collection(db, 'products');
-    addDoc(productsRef, {
-      ...newProduct,
-      createdAt: serverTimestamp(),
-    }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: productsRef.path,
-          operation: 'create',
-          requestResourceData: newProduct,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-  }, [db, isAdmin]);
+    setProducts(prev => [...prev, newProduct]);
+    setLoading(false);
+    console.log('Added demo product:', newProduct);
+  };
 
-  const updateProduct = useCallback(async (productId: string, productData: Partial<Product>) => {
-    if (!db || !isAdmin) return;
-    const productRef = doc(db, 'products', productId);
-    updateDoc(productRef, productData)
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: productRef.path,
-          operation: 'update',
-          requestResourceData: productData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-  }, [db, isAdmin]);
+  const updateProduct = async (id: string, updates: any) => {
+    if (!isAdmin) return;
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  };
 
-  const deleteProduct = useCallback(async (productId: string) => {
-    if (!db || !isAdmin) return;
-    const productRef = doc(db, 'products', productId)
-    deleteDoc(productRef)
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: productRef.path,
-          operation: 'delete',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-  }, [db, isAdmin]);
+  const deleteProduct = async (id: string) => {
+    if (!isAdmin) return;
+    setProducts(prev => prev.filter(p => p.id !== id));
+  };
 
-  const getProductById = useCallback((productId: string) => {
-    return products?.find(p => p.id === productId);
-  }, [products]);
-
-  const addImage = useCallback(async (imageData: NewImageData) => {
-    if (!db || !isAdmin) return;
-    const imagesRef = collection(db, 'images');
-    addDoc(imagesRef, {
-        ...imageData,
-        createdAt: serverTimestamp(),
-    }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-            path: imagesRef.path,
-            operation: 'create',
-            requestResourceData: imageData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-    });
-  }, [db, isAdmin]);
-  
-  const value = useMemo(() => ({ 
-    products,
-    images,
-    loading: productsLoading || isAdminLoading || imagesLoading, 
-    addProduct, 
-    updateProduct, 
-    deleteProduct, 
-    getProductById,
-    addImage,
-  }), [products, images, productsLoading, isAdminLoading, imagesLoading, addProduct, updateProduct, deleteProduct, getProductById, addImage]);
+  const getProductById = (id: string) => {
+    return products.find(p => p.id === id);
+  };
 
   return (
-    <ProductContext.Provider value={value}>
+    <ProductContext.Provider value={{
+      products,
+      loading,
+      addProduct,
+      updateProduct,
+      deleteProduct,
+      getProductById,
+    }}>
       {children}
     </ProductContext.Provider>
   );
@@ -137,8 +92,6 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
 export function useProducts() {
   const context = useContext(ProductContext);
-  if (context === undefined) {
-    throw new Error('useProducts must be used within a ProductProvider');
-  }
   return context;
 }
+

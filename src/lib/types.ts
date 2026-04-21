@@ -1,4 +1,4 @@
-export type Product = {
+export interface Product {
   id: string;
   name: string;
   category: 'Men' | 'Women' | 'Kids';
@@ -13,36 +13,30 @@ export type Product = {
   rating: number;
   reviewCount: number;
   viewCount: number;
-  color: string;
+  strap?: string;
+  color?: string;
   sizes?: string[];
   fit?: string;
-  strap?: string;
   sleeve?: string;
-  createdAt?: {
-    seconds: number;
-    nanoseconds: number;
-  } | Date;
-};
+  createdAt: string;
+}
 
-export type Category = {
-  name: 'Men' | 'Women' | 'Kids';
-  slug: 'men' | 'women' | 'kids';
+export interface Image {
+  id: string;
+  url: string;
+  altText: string;
+  createdAt: string;
+}
+
+export interface Category {
+  name: string;
+  slug: string;
   image: string;
   description: string;
-  subCategories?: SubCategory[];
-};
+  subCategories: SubCategory[];
+}
 
-export type NavLink = {
-  name: string;
-  slug: string;
-};
-
-export type SubCategory = {
-  name: string;
-  slug: string;
-};
-
-export type BusinessDetails = {
+export interface BusinessDetails {
   shop_name: string;
   phone: string;
   email: string;
@@ -54,18 +48,13 @@ export type BusinessDetails = {
   };
 }
 
-export type UserProfile = {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  role: 'admin' | 'user';
-};
+export interface SubCategory {
+  name: string;
+  slug: string;
+}
 
-export type Image = {
-  id: string;
-  url: string;
-  altText: string;
-  createdAt?: { seconds: number; nanoseconds: number; } | Date;
-};
-    
+export interface NavLink {
+  name: string;
+  slug: string;
+}
+
