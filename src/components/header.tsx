@@ -27,7 +27,7 @@ function NavLinkWithDropdown({ category }: { category: Category }) {
             {category.subCategories?.map((sub) => (
               <Link
                 key={sub.slug}
-                href={`/products/${category.slug}`}
+                href={`/products/${category.slug}?sub=${sub.slug}`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 role="menuitem"
               >
@@ -73,7 +73,7 @@ export function Header() {
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-[200px] focus:w-[280px] transition-all duration-300 ease-in-out h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
+                className="w-[180px] focus:w-[280px] transition-all duration-300 ease-in-out h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
               />
             </div>
            <Button asChild className="h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90">
@@ -110,7 +110,7 @@ export function Header() {
                           <div className="flex flex-col space-y-2 pl-4">
                             <Link href={`/products/${category.slug}`} className="block py-1 text-muted-foreground hover:text-primary">All {category.name}</Link>
                             {category.subCategories?.map(sub => (
-                              <Link key={sub.slug} href={`/products/${category.slug}`} className="block py-1 text-muted-foreground hover:text-primary">{sub.name}</Link>
+                              <Link key={sub.slug} href={`/products/${category.slug}?sub=${sub.slug}`} className="block py-1 text-muted-foreground hover:text-primary">{sub.name}</Link>
                             ))}
                           </div>
                         </AccordionContent>
