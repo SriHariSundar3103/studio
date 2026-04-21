@@ -7,7 +7,7 @@
       "properties": {
         "name": { "type": "string", "description": "The name of the product." },
         "category": { "type": "string", "enum": ["Men", "Women", "Kids"], "description": "The product category." },
-        "productType": { "type": "string", "enum": ["Watch", "Shirt", "Pant"], "description": "The type of product within a category." },
+        "productType": { "type": "string", "description": "The type of product sub-category (e.g. watch, shirt, fashion-watches)." },
         "price": { "type": "number", "description": "The price of the product." },
         "description": { "type": "string", "description": "A detailed description of the product." },
         "stockStatus": { "type": "string", "enum": ["Available", "Out of Stock"], "description": "Current stock availability." },

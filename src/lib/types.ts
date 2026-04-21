@@ -2,7 +2,7 @@ export type Product = {
   id: string;
   name: string;
   category: 'Men' | 'Women' | 'Kids';
-  productType: 'Watch' | 'Shirt' | 'Pant';
+  productType: string;
   price: number;
   images: string[];
   description: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
@@ -25,18 +25,19 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { categories } from '@/lib/data';
+import { categories, menSubCategories, womenSubCategories, kidsSubCategories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
 import { useProducts, type NewProductData } from '@/context/product-context';
 import { ImageSelector } from '@/components/image-selector';
+import type { SubCategory } from '@/lib/types';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   priceInr: z.coerce.number().min(0, 'Price must be a positive number'),
   category: z.enum(['Men', 'Women', 'Kids']),
-  productType: z.enum(['Watch', 'Shirt', 'Pant']),
+  productType: z.string().min(1, 'Please select a product type'),
   tags: z.string(),
   stockStatus: z.enum(['Available', 'Out of Stock']),
   images: z.array(z.string()).min(1, 'Please select at least one image'),
@@ -58,12 +59,30 @@ export default function AddProductPage() {
         description: '',
         priceInr: 0,
         category: 'Men',
-        productType: 'Watch',
+        productType: 'watch',
         stockStatus: 'Available',
         tags: '',
         images: [],
     },
   });
+
+  const category = form.watch('category');
+  const [productTypes, setProductTypes] = useState<SubCategory[]>(menSubCategories);
+
+  useEffect(() => {
+    let newProductTypes: SubCategory[] = [];
+    if (category === 'Men') {
+      newProductTypes = menSubCategories;
+    } else if (category === 'Women') {
+      newProductTypes = womenSubCategories;
+    } else if (category === 'Kids') {
+      newProductTypes = kidsSubCategories;
+    }
+    setProductTypes(newProductTypes);
+    if (newProductTypes.length > 0) {
+      form.setValue('productType', newProductTypes[0].slug);
+    }
+  }, [category, form]);
 
   const onSubmit = async (data: ProductFormValues) => {
     setIsSaving(true);
@@ -249,18 +268,19 @@ export default function AddProductPage() {
                         control={form.control}
                         name="productType"
                         render={({ field }) => (
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                             <Select onValueChange={field.onChange} value={field.value}>
                                 <SelectTrigger id="productType" aria-label="Select product type">
                                     <SelectValue placeholder="Select product type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Watch">Watch</SelectItem>
-                                    <SelectItem value="Shirt">Shirt</SelectItem>
-                                    <SelectItem value="Pant">Pant</SelectItem>
+                                    {productTypes.map(pt => (
+                                      <SelectItem key={pt.slug} value={pt.slug}>{pt.name}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         )}
                       />
+                       {form.formState.errors.productType && <p className="text-sm text-destructive">{form.formState.errors.productType.message}</p>}
                   </div>
                    <div className="space-y-2">
                     <Label htmlFor="priceInr">Price (INR)</Label>

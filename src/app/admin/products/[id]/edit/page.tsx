@@ -25,19 +25,21 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { categories } from '@/lib/data';
+import { categories, menSubCategories, womenSubCategories, kidsSubCategories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProducts } from '@/context/product-context';
 import { ImageSelector } from '@/components/image-selector';
+import type { SubCategory } from '@/lib/types';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   priceInr: z.coerce.number().min(0, 'Price must be a positive number'),
   category: z.enum(['Men', 'Women', 'Kids']),
+  productType: z.string().min(1, 'Please select a product type'),
   tags: z.string(),
   stockStatus: z.enum(['Available', 'Out of Stock']),
   images: z.array(z.string()).min(1, 'Please select at least one image'),
@@ -59,6 +61,27 @@ export default function EditProductPage() {
     resolver: zodResolver(productSchema),
   });
 
+  const category = form.watch('category');
+  const [productTypes, setProductTypes] = useState<SubCategory[]>([]);
+
+  useEffect(() => {
+    let newProductTypes: SubCategory[] = [];
+    if (category === 'Men') {
+      newProductTypes = menSubCategories;
+    } else if (category === 'Women') {
+      newProductTypes = womenSubCategories;
+    } else if (category === 'Kids') {
+      newProductTypes = kidsSubCategories;
+    }
+    setProductTypes(newProductTypes);
+    
+    // Only reset productType if the current one is not in the new list of types
+    const currentProductType = form.getValues('productType');
+    if (newProductTypes.length > 0 && !newProductTypes.some(pt => pt.slug === currentProductType)) {
+        form.setValue('productType', newProductTypes[0].slug);
+    }
+  }, [category, form]);
+
   useEffect(() => {
     if (id) {
       const productToEdit = getProductById(id);
@@ -69,6 +92,7 @@ export default function EditProductPage() {
           description: productToEdit.description,
           priceInr: productToEdit.price,
           category: productToEdit.category,
+          productType: productToEdit.productType,
           tags: productToEdit.tags.join(', '),
           stockStatus: productToEdit.stockStatus,
           images: productToEdit.images,
@@ -97,6 +121,7 @@ export default function EditProductPage() {
         description: data.description,
         price: data.priceInr,
         category: data.category,
+        productType: data.productType,
         tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
         stockStatus: data.stockStatus,
         images: data.images,
@@ -283,6 +308,26 @@ export default function EditProductPage() {
                             </Select>
                         )}
                       />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="productType">Product Type</Label>
+                    <Controller
+                        control={form.control}
+                        name="productType"
+                        render={({ field }) => (
+                             <Select onValueChange={field.onChange} value={field.value}>
+                                <SelectTrigger id="productType" aria-label="Select product type">
+                                    <SelectValue placeholder="Select product type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {productTypes.map(pt => (
+                                      <SelectItem key={pt.slug} value={pt.slug}>{pt.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                      />
+                      {form.formState.errors.productType && <p className="text-sm text-destructive">{form.formState.errors.productType.message}</p>}
                   </div>
                    <div className="space-y-2">
                     <Label htmlFor="priceInr">Price (INR)</Label>
