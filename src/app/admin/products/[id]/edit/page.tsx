@@ -31,6 +31,7 @@ import { generateProductDescription } from '@/ai/flows/admin-product-description
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProducts } from '@/context/product-context';
+import { ImageSelector } from '@/components/image-selector';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
@@ -39,7 +40,7 @@ const productSchema = z.object({
   category: z.enum(['Men', 'Women', 'Kids']),
   tags: z.string(),
   stockStatus: z.enum(['Available', 'Out of Stock']),
-  images: z.string().optional(),
+  images: z.array(z.string()).min(1, 'Please select at least one image'),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -70,13 +71,12 @@ export default function EditProductPage() {
           category: productToEdit.category,
           tags: productToEdit.tags.join(', '),
           stockStatus: productToEdit.stockStatus,
-          images: productToEdit.images.join(', '),
+          images: productToEdit.images,
         });
       }
     }
   }, [id, form, getProductById]);
   
-  // Effect to handle case where product is not found after loading
   useEffect(() => {
     if (product === undefined) {
       // Still loading
@@ -99,7 +99,7 @@ export default function EditProductPage() {
         category: data.category,
         tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
         stockStatus: data.stockStatus,
-        images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : product?.images,
+        images: data.images,
     };
 
     await updateProduct(id, updatedData);
@@ -215,6 +215,24 @@ export default function EditProductPage() {
                   </div>
                 </CardContent>
               </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Product Images</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Controller
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                      <ImageSelector
+                        selectedImages={field.value ?? []}
+                        onSelectionChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {form.formState.errors.images && <p className="text-sm text-destructive mt-2">{form.formState.errors.images.message}</p>}
+                </CardContent>
+              </Card>
             </div>
             <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
                <Card>
@@ -274,11 +292,6 @@ export default function EditProductPage() {
                   <div className="space-y-2">
                     <Label htmlFor="tags">Tags (comma-separated)</Label>
                     <Input id="tags" {...form.register('tags')} placeholder="e.g. Formal, Leather" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="images">Image IDs (comma-separated)</Label>
-                    <Input id="images" {...form.register('images')} placeholder="e.g. hsk-m-001-1,hsk-m-001-2" />
-                     <p className="text-xs text-muted-foreground">Find IDs in src/lib/placeholder-images.json</p>
                   </div>
                 </CardContent>
               </Card>

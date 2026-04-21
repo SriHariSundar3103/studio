@@ -8,7 +8,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-export type NewProductData = Omit<Product, 'id' | 'images' | 'isTrending' | 'isDealOfTheDay' | 'rating' | 'reviewCount' | 'createdAt'>;
+export type NewProductData = Omit<Product, 'id' | 'isTrending' | 'isDealOfTheDay' | 'rating' | 'reviewCount' | 'createdAt'>;
 
 interface ProductContextType {
   products: Product[];
@@ -59,7 +59,6 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   const addProduct = useCallback(async (productData: NewProductData) => {
     if (!db) return;
     const newProduct: Omit<Product, 'id' | 'createdAt'> = {
-      images: ['hsk-m-001-1', 'hsk-m-001-2', 'hsk-m-001-3'], // Placeholder images
       isTrending: false,
       isDealOfTheDay: false,
       rating: 4.5,

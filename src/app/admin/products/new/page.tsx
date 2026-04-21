@@ -25,10 +25,11 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { categories, menSubCategories } from '@/lib/data';
+import { categories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
 import { useProducts, type NewProductData } from '@/context/product-context';
+import { ImageSelector } from '@/components/image-selector';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
@@ -38,6 +39,7 @@ const productSchema = z.object({
   productType: z.enum(['Watch', 'Shirt', 'Pant']),
   tags: z.string(),
   stockStatus: z.enum(['Available', 'Out of Stock']),
+  images: z.array(z.string()).min(1, 'Please select at least one image'),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -59,6 +61,7 @@ export default function AddProductPage() {
         productType: 'Watch',
         stockStatus: 'Available',
         tags: '',
+        images: [],
     },
   });
 
@@ -73,6 +76,7 @@ export default function AddProductPage() {
         tags: data.tags.split(',').map(t => t.trim()).filter(Boolean),
         stockStatus: data.stockStatus,
         color: 'Default',
+        images: data.images,
     };
     await addProduct(newProductData);
 
@@ -167,6 +171,25 @@ export default function AddProductPage() {
                     <Textarea id="description" {...form.register('description')} rows={5}/>
                      {form.formState.errors.description && <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>}
                   </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Product Images</CardTitle>
+                  <CardDescription>Select the images for your product gallery.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Controller
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                      <ImageSelector
+                        selectedImages={field.value ?? []}
+                        onSelectionChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {form.formState.errors.images && <p className="text-sm text-destructive mt-2">{form.formState.errors.images.message}</p>}
                 </CardContent>
               </Card>
             </div>
