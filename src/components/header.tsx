@@ -8,8 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { businessDetails, categories, otherNavLinks } from "@/lib/data";
 import type { Category } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 function NavLinkWithDropdown({ category }: { category: Category }) {
   return (
@@ -42,10 +50,50 @@ function NavLinkWithDropdown({ category }: { category: Category }) {
 }
 
 export function Header() {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const router = useRouter();
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsDialogOpen(false);
+    }
+  };
+
+  const searchDialog = (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Search className="h-5 w-5" />
+          <span className="sr-only">Search</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Search for Products</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSearchSubmit} className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Input
+              id="search"
+              placeholder="Search watches, shirts, pants..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="col-span-4"
+            />
+          </div>
+          <Button type="submit" className="w-full">Search</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white text-foreground h-[70px]">
-      <div className="container flex h-full items-center px-4 md:px-6">
-        
+      <div className="container flex h-full items-center justify-between px-4 md:px-6">
         {/* Left Section: Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
@@ -53,39 +101,36 @@ export function Header() {
             <span className="font-bold text-[22px] text-black">Hi/sky</span>
           </Link>
         </div>
-        
-        {/* Center Section: Nav */}
-        <nav className="hidden md:flex items-center space-x-6 ml-8">
-            {categories.map((cat) => (
-              <NavLinkWithDropdown key={cat.slug} category={cat} />
-            ))}
-            {otherNavLinks.map((link) => (
-              <Link key={link.slug} href={`/${link.slug}`} className="text-base font-medium text-foreground transition-colors hover:text-primary">
-                {link.name}
-              </Link>
-            ))}
-        </nav>
 
-        {/* Right Section: Nav, Search and Contact */}
-        <div className="flex items-center gap-4 ml-auto">
-            <Button variant="ghost" size="icon">
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
-            </Button>
-           <Button asChild className="h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90">
-              <a href={`tel:${businessDetails.phone}`}>
-                <Phone className="mr-2 h-4 w-4" />
-                Call Now
-              </a>
-            </Button>
+        {/* Center & Right Section */}
+        <div className="flex items-center gap-6">
+           {/* Center Section: Nav */}
+            <nav className="hidden md:flex items-center space-x-6 ml-8">
+                {categories.map((cat) => (
+                <NavLinkWithDropdown key={cat.slug} category={cat} />
+                ))}
+                {otherNavLinks.map((link) => (
+                <Link key={link.slug} href={`/${link.slug}`} className="text-base font-medium text-foreground transition-colors hover:text-primary">
+                    {link.name}
+                </Link>
+                ))}
+            </nav>
+
+            {/* Right Section: Search and Contact */}
+            <div className="flex items-center gap-4">
+                {searchDialog}
+                <Button asChild className="h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90 hidden md:flex">
+                    <a href={`tel:${businessDetails.phone}`}>
+                        <Phone className="mr-2 h-4 w-4" />
+                        Call Now
+                    </a>
+                </Button>
+            </div>
         </div>
         
         {/* Mobile Nav Trigger */}
-        <div className="flex items-center gap-2 md:hidden ml-auto">
-          <Button variant="ghost" size="icon">
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
-          </Button>
+        <div className="flex items-center gap-2 md:hidden">
+          {searchDialog}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
