@@ -28,7 +28,13 @@ export type Category = {
   slug: 'men' | 'women' | 'kids';
   image: string;
   description: string;
-}
+  subCategories?: SubCategory[];
+};
+
+export type NavLink = {
+  name: string;
+  slug: string;
+};
 
 export type SubCategory = {
   name: string;
