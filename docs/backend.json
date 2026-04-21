@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A product in the watch store.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the product." },
+        "category": { "type": "string", "enum": ["Men", "Women", "Kids"], "description": "The product category." },
+        "price": { "type": "number", "description": "The price of the product." },
+        "description": { "type": "string", "description": "A detailed description of the product." },
+        "stockStatus": { "type": "string", "enum": ["Available", "Out of Stock"], "description": "Current stock availability." },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Descriptive tags for the product." },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "A list of image IDs for the product." },
+        "isTrending": { "type": "boolean", "description": "Whether the product is currently trending." },
+        "isDealOfTheDay": { "type": "boolean", "description": "Whether the product is a deal of the day." },
+        "rating": { "type": "number", "description": "The average user rating." },
+        "reviewCount": { "type": "number", "description": "The total number of reviews." },
+        "strap": { "type": "string", "description": "The material of the watch strap." },
+        "color": { "type": "string", "description": "The primary color of the watch." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The timestamp when the product was created." }
+      },
+      "required": ["name", "category", "price", "stockStatus", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": []
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Contains all product listings for the store."
+    }
+  }
+}

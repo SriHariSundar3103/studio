@@ -51,7 +51,8 @@ export default function EditProductPage() {
   const { toast } = useToast();
   const { getProductById, updateProduct } = useProducts();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [product, setProduct] = useState<Product | undefined | null>(null);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -71,18 +72,26 @@ export default function EditProductPage() {
           stockStatus: productToEdit.stockStatus,
           images: productToEdit.images.join(', '),
         });
-      } else {
-        toast({
-            variant: 'destructive',
-            title: 'Product not found',
-            description: 'Could not find a product with that ID.',
-        });
-        router.push('/admin/products');
       }
     }
-  }, [id, router, toast, form, getProductById]);
+  }, [id, form, getProductById]);
+  
+  // Effect to handle case where product is not found after loading
+  useEffect(() => {
+    if (product === undefined) {
+      // Still loading
+    } else if (product === null) {
+      toast({
+          variant: 'destructive',
+          title: 'Product not found',
+          description: 'Could not find a product with that ID.',
+      });
+      router.push('/admin/products');
+    }
+  }, [product, router, toast]);
 
-  const onSubmit = (data: ProductFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
+    setIsSaving(true);
     const updatedData: Partial<Product> = {
         name: data.productName,
         description: data.description,
@@ -93,13 +102,14 @@ export default function EditProductPage() {
         images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : product?.images,
     };
 
-    updateProduct(id, updatedData);
+    await updateProduct(id, updatedData);
     
     toast({
       title: 'Product Updated',
       description: `${data.productName} has been successfully updated.`,
     });
     router.push('/admin/products');
+    setIsSaving(false);
   };
   
   const handleGenerateDescription = async () => {
@@ -136,7 +146,7 @@ export default function EditProductPage() {
     }
   };
 
-  if (!product) {
+  if (product === null || product === undefined) {
     return (
       <div className="mx-auto grid max-w-[59rem] flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
@@ -172,7 +182,9 @@ export default function EditProductPage() {
                 <Button variant="outline" size="sm" type="button" onClick={() => router.push('/admin/products')}>
                     Cancel
                 </Button>
-                <Button size="sm" type="submit">Save Changes</Button>
+                <Button size="sm" type="submit" disabled={isSaving}>
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
              </div>
           </div>
           <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8 mt-4">
@@ -276,7 +288,9 @@ export default function EditProductPage() {
             <Button variant="outline" size="sm" type="button" onClick={() => router.push('/admin/products')}>
                 Cancel
             </Button>
-            <Button size="sm" type="submit">Save Changes</Button>
+            <Button size="sm" type="submit" disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
           </div>
         </form>
     </div>

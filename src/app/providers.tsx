@@ -1,7 +1,12 @@
 'use client';
 
 import { ProductProvider } from '@/context/product-context';
+import { FirebaseClientProvider } from '@/firebase';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <ProductProvider>{children}</ProductProvider>;
+  return (
+    <FirebaseClientProvider>
+      <ProductProvider>{children}</ProductProvider>
+    </FirebaseClientProvider>
+  );
 }

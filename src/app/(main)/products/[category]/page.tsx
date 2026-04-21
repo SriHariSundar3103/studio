@@ -22,11 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CategoryPage() {
   const params = useParams();
   const category = params.category as string;
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const [sortBy, setSortBy] = useState('trending');
 
   const currentCategory = categories.find(c => c.slug === category);
@@ -35,7 +36,7 @@ export default function CategoryPage() {
     ? products 
     : products.filter(p => p.category.toLowerCase() === category), [products, category]);
     
-  if (!currentCategory && category !== 'all') {
+  if (!loading && !currentCategory && category !== 'all') {
     notFound();
   }
 
@@ -49,11 +50,7 @@ export default function CategoryPage() {
         sortableProducts.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        sortableProducts.sort((a, b) => {
-            const idA = parseInt(a.id.split('-').pop()?.replace('new','') || '0');
-            const idB = parseInt(b.id.split('-').pop()?.replace('new','') || '0');
-            return idB - idA;
-        });
+        sortableProducts.sort((a, b) => (b.createdAt as any) - (a.createdAt as any));
         break;
       case 'popularity':
         sortableProducts.sort((a, b) => b.reviewCount - a.reviewCount);
@@ -68,6 +65,18 @@ export default function CategoryPage() {
 
   const categoryName = currentCategory ? currentCategory.name : 'All';
   const isWomenCategory = category === 'women';
+
+  const ProductGridSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[...Array(6)].map((_, i) => (
+         <div key={i} className="space-y-2">
+            <Skeleton className="aspect-square w-full" />
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+          </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="container py-8">
@@ -107,7 +116,7 @@ export default function CategoryPage() {
       </div>
 
        <div className="flex items-baseline justify-between mb-8">
-        <p className="text-sm text-muted-foreground">{sortedProducts.length} products</p>
+        <p className="text-sm text-muted-foreground">{loading ? <Skeleton className="h-5 w-20" /> : `${sortedProducts.length} products`}</p>
         <div className="flex items-center gap-4">
             <Select onValueChange={setSortBy} defaultValue="trending">
               <SelectTrigger className="w-[180px]">
@@ -129,7 +138,7 @@ export default function CategoryPage() {
           <ProductFilters category={category} />
         </aside>
         <main className="lg:col-span-3">
-          {sortedProducts.length > 0 ? (
+          {loading ? <ProductGridSkeleton /> : sortedProducts.length > 0 ? (
             <>
               <ProductGrid products={sortedProducts} />
               <div className="flex justify-center items-center mt-12 space-x-1">

@@ -1,8 +1,12 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { products as initialProducts } from '@/lib/data';
 import type { Product } from '@/lib/types';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs, writeBatch, query } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export type NewProductData = {
   name: string;
@@ -15,26 +19,55 @@ export type NewProductData = {
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (productData: NewProductData) => void;
-  updateProduct: (productId: string, productData: Partial<Product>) => void;
-  deleteProduct: (productId: string) => void;
+  loading: boolean;
+  addProduct: (productData: NewProductData) => Promise<void>;
+  updateProduct: (productId: string, productData: Partial<Product>) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
   getProductById: (productId: string) => Product | undefined;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const db = useFirestore();
+  const productsQuery = useMemo(() => db ? query(collection(db, 'products')) : null, [db]);
+  const { data: productsData, loading } = useCollection<Product>(productsQuery);
 
-  const addProduct = useCallback((productData: NewProductData) => {
-    const newProduct: Product = {
-      id: `hsk-new-${Date.now()}`,
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      category: productData.category,
-      tags: productData.tags,
-      stockStatus: productData.stockStatus,
+  const products = useMemo(() => (productsData || []).map(p => ({
+    ...p,
+    // Firestore timestamps need to be converted to JS Dates if they exist
+    createdAt: (p.createdAt as any)?.toDate ? (p.createdAt as any).toDate() : p.createdAt,
+  })).sort((a, b) => (b.createdAt as any) - (a.createdAt as any)), [productsData]);
+
+
+  // Seed the database with initial products if it's empty
+  useEffect(() => {
+    const seedDatabase = async () => {
+      if (!db || products.length > 0 || loading) return;
+      
+      const productsRef = collection(db, "products");
+      const snapshot = await getDocs(productsRef);
+      
+      if (snapshot.empty) {
+        console.log('Seeding database with initial products...');
+        const batch = writeBatch(db);
+        initialProducts.forEach((product) => {
+          const { id, ...productData } = product;
+          const docRef = doc(productsRef, id); // Use existing ID for consistency
+          batch.set(docRef, { ...productData, createdAt: serverTimestamp() });
+        });
+        await batch.commit();
+      }
+    };
+
+    seedDatabase();
+  }, [db, products.length, loading]);
+
+
+  const addProduct = useCallback(async (productData: NewProductData) => {
+    if (!db) return;
+    const newProduct: Omit<Product, 'id' | 'createdAt'> = {
+      ...productData,
       images: ['hsk-m-001-1', 'hsk-m-001-2', 'hsk-m-001-3'], // Placeholder images
       isTrending: false,
       isDealOfTheDay: false,
@@ -43,24 +76,59 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       strap: productData.tags.find(t => t.toLowerCase().includes('strap')) || 'Leather',
       color: 'Black',
     };
-    setProducts(prevProducts => [newProduct, ...prevProducts]);
-  }, []);
+    const productsRef = collection(db, 'products');
+    addDoc(productsRef, {
+      ...newProduct,
+      createdAt: serverTimestamp(),
+    }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: productsRef.path,
+          operation: 'create',
+          requestResourceData: newProduct,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+  }, [db]);
 
-  const updateProduct = useCallback((productId: string, productData: Partial<Product>) => {
-    setProducts(prevProducts =>
-      prevProducts.map(p => (p.id === productId ? { ...p, ...productData } : p))
-    );
-  }, []);
+  const updateProduct = useCallback(async (productId: string, productData: Partial<Product>) => {
+    if (!db) return;
+    const productRef = doc(db, 'products', productId);
+    updateDoc(productRef, productData)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: productRef.path,
+          operation: 'update',
+          requestResourceData: productData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+  }, [db]);
 
-  const deleteProduct = useCallback((productId: string) => {
-    setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-  }, []);
-  
+  const deleteProduct = useCallback(async (productId: string) => {
+    if (!db) return;
+    const productRef = doc(db, 'products', productId)
+    deleteDoc(productRef)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: productRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+  }, [db]);
+
   const getProductById = useCallback((productId: string) => {
-    return products.find(p => p.id === productId);
+    return products?.find(p => p.id === productId);
   }, [products]);
   
-  const value = useMemo(() => ({ products, addProduct, updateProduct, deleteProduct, getProductById }), [products, addProduct, updateProduct, deleteProduct, getProductById]);
+  const value = useMemo(() => ({ 
+    products, 
+    loading, 
+    addProduct, 
+    updateProduct, 
+    deleteProduct, 
+    getProductById 
+  }), [products, loading, addProduct, updateProduct, deleteProduct, getProductById]);
 
   return (
     <ProductContext.Provider value={value}>

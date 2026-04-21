@@ -13,6 +13,10 @@ export type Product = {
   reviewCount: number;
   strap: string;
   color: string;
+  createdAt?: {
+    seconds: number;
+    nanoseconds: number;
+  } | Date;
 };
 
 export type Category = {

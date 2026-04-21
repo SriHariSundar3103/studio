@@ -46,6 +46,7 @@ export default function AddProductPage() {
   const { toast } = useToast();
   const { addProduct } = useProducts();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -59,7 +60,8 @@ export default function AddProductPage() {
     },
   });
 
-  const onSubmit = (data: ProductFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
+    setIsSaving(true);
     const newProductData: NewProductData = {
         name: data.productName,
         description: data.description,
@@ -68,13 +70,14 @@ export default function AddProductPage() {
         tags: data.tags.split(',').map(t => t.trim()).filter(Boolean),
         stockStatus: data.stockStatus,
     };
-    addProduct(newProductData);
+    await addProduct(newProductData);
 
     toast({
       title: 'Product Added',
       description: `${data.productName} has been successfully added.`,
     });
     router.push('/admin/products');
+    setIsSaving(false);
   };
   
   const handleGenerateDescription = async () => {
@@ -129,7 +132,9 @@ export default function AddProductPage() {
                 <Button variant="outline" size="sm" type="button" onClick={() => router.push('/admin/products')}>
                     Cancel
                 </Button>
-                <Button size="sm" type="submit">Save Product</Button>
+                <Button size="sm" type="submit" disabled={isSaving}>
+                  {isSaving ? 'Saving...' : 'Save Product'}
+                </Button>
              </div>
           </div>
           <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8 mt-4">
@@ -228,7 +233,9 @@ export default function AddProductPage() {
             <Button variant="outline" size="sm" type="button" onClick={() => router.push('/admin/products')}>
                 Cancel
             </Button>
-            <Button size="sm" type="submit">Save Product</Button>
+            <Button size="sm" type="submit" disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Product'}
+            </Button>
           </div>
         </form>
     </div>
