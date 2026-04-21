@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/products/${product.category.toLowerCase()}`}>{product.category} Watches</BreadcrumbLink>
+            <BreadcrumbLink href={`/products/${product.category.toLowerCase()}`}>{product.category === 'Men' ? "Men's Collection" : `${product.category} Watches`}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

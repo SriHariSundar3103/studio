@@ -27,7 +27,7 @@ export function CategoryShowcase() {
               <div className="absolute inset-0 flex items-end p-6">
                 <CardHeader className="p-0">
                   <CardTitle className="text-2xl font-bold text-white flex items-center">
-                    {category.name} Watches
+                    {category.name === 'Men' ? "Men's Collection" : `${category.name} Watches`}
                     <ArrowRight className="ml-2 h-5 w-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </CardTitle>
                 </CardHeader>
