@@ -3,66 +3,42 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut as firebaseSignOut,
-  type User,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, type Firestore, writeBatch } from 'firebase/firestore';
-import type { UserProfile } from '@/lib/types';
+import type { User } from 'firebase/auth';
 import { initializeFirebase } from '@/firebase';
 
-const ADMIN_EMAILS = ['sri352006@gmail.com'];
-
-async function getOrCreateUserProfile(db: Firestore, user: User): Promise<UserProfile> {
-  const userRef = doc(db, 'users', user.uid);
-  const userSnap = await getDoc(userRef);
-
-  if (userSnap.exists()) {
-    return userSnap.data() as UserProfile;
-  } else {
-    const batch = writeBatch(db);
-    const role = ADMIN_EMAILS.includes(user.email || '') ? 'admin' : 'user';
-    
-    const newUserProfile: UserProfile = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      role: role,
-    };
-    
-    batch.set(userRef, { ...newUserProfile, createdAt: serverTimestamp() });
-
-    if (role === 'admin') {
-      const adminRoleRef = doc(db, 'roles_admin', user.uid);
-      batch.set(adminRoleRef, { role: 'admin' });
-    }
-
-    await batch.commit();
-    return newUserProfile;
-  }
+async function mockProfile(user: User) {
+  return {
+    uid: user.uid,
+    email: user.email || '',
+    displayName: user.displayName || '',
+    photoURL: user.photoURL || '',
+    role: user.email === 'sri352006@gmail.com' ? 'admin' : 'user',
+  };
 }
 
-export async function signInWithGoogle(): Promise<{ user: User, profile: UserProfile } | null> {
-  const { auth, firestore } = initializeFirebase();
-  if (!auth || !firestore) {
-    throw new Error("Firebase not initialized");
+export async function signInWithGoogle(): Promise<{ user: User; profile: any } | null> {
+  const { auth } = initializeFirebase();
+  if (!auth) {
+    console.error('Firebase not initialized');
+    return null;
   }
   
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const profile = await getOrCreateUserProfile(firestore, user);
+    const profile = await mockProfile(user);
     return { user, profile };
-  } catch (error) {
-    console.error("Error during sign-in:", error);
+  } catch (error: any) {
+    console.error("Sign-in error:", error);
     return null;
   }
 }
 
 export async function signOut() {
   const { auth } = initializeFirebase();
-  if (!auth) {
-    throw new Error("Firebase not initialized");
-  }
+  if (!auth) return;
   await firebaseSignOut(auth);
 }
+
