@@ -67,15 +67,11 @@ export function Header() {
         </nav>
 
         {/* Right Section: Nav, Search and Contact */}
-        <div className="hidden md:flex items-center gap-6 ml-auto">
-           <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="w-[180px] focus:w-[280px] transition-all duration-300 ease-in-out h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
-              />
-            </div>
+        <div className="flex items-center gap-4 ml-auto">
+            <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
            <Button asChild className="h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90">
               <a href={`tel:${businessDetails.phone}`}>
                 <Phone className="mr-2 h-4 w-4" />
@@ -85,7 +81,11 @@ export function Header() {
         </div>
         
         {/* Mobile Nav Trigger */}
-        <div className="md:hidden ml-auto">
+        <div className="flex items-center gap-2 md:hidden ml-auto">
+          <Button variant="ghost" size="icon">
+            <Search className="h-5 w-5" />
+            <span className="sr-only">Search</span>
+          </Button>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -124,14 +124,6 @@ export function Header() {
                   </Accordion>
                 </nav>
                 <div className="mt-auto pt-6 space-y-4">
-                   <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder="Search..."
-                        className="w-full h-[38px] rounded-md border-input bg-secondary pl-9 text-foreground focus:bg-background"
-                      />
-                    </div>
                    <Button asChild className="w-full h-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-accent/90">
                       <a href={`tel:${businessDetails.phone}`}>
                         <Phone className="mr-2 h-4 w-4" />
