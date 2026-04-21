@@ -102,9 +102,11 @@ function UserNav() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {isAdmin && (
-                  <DropdownMenuItem onClick={() => router.push('/admin/dashboard')}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Admin Dashboard</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/dashboard" className="flex w-full cursor-pointer items-center">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Admin Dashboard</span>
+                    </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleLogout}>
