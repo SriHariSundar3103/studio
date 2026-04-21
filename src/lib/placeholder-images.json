@@ -143,6 +143,66 @@
       "id": "hsk-k-002-3",
       "imageUrl": "https://picsum.photos/seed/hsk-k-002-3/800/800",
       "imageHint": "child writing"
+    },
+    {
+      "id": "hsk-m-shirt-001-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-001-1/800/800",
+      "imageHint": "white shirt"
+    },
+    {
+      "id": "hsk-m-shirt-001-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-001-2/800/800",
+      "imageHint": "formal shirt"
+    },
+    {
+      "id": "hsk-m-shirt-001-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-001-3/800/800",
+      "imageHint": "shirt detail"
+    },
+    {
+      "id": "hsk-m-pant-001-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-001-1/800/800",
+      "imageHint": "khaki chinos"
+    },
+    {
+      "id": "hsk-m-pant-001-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-001-2/800/800",
+      "imageHint": "mens pants"
+    },
+    {
+      "id": "hsk-m-pant-001-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-001-3/800/800",
+      "imageHint": "pant fabric"
+    },
+    {
+      "id": "hsk-m-shirt-002-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-002-1/800/800",
+      "imageHint": "checked shirt"
+    },
+    {
+      "id": "hsk-m-shirt-002-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-002-2/800/800",
+      "imageHint": "casual shirt"
+    },
+    {
+      "id": "hsk-m-shirt-002-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-shirt-002-3/800/800",
+      "imageHint": "man fashion"
+    },
+    {
+      "id": "hsk-m-pant-002-1",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-002-1/800/800",
+      "imageHint": "blue jeans"
+    },
+    {
+      "id": "hsk-m-pant-002-2",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-002-2/800/800",
+      "imageHint": "denim texture"
+    },
+    {
+      "id": "hsk-m-pant-002-3",
+      "imageUrl": "https://picsum.photos/seed/hsk-m-pant-002-3/800/800",
+      "imageHint": "jeans model"
     }
   ]
 }

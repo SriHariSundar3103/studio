@@ -2,11 +2,12 @@
   "entities": {
     "Product": {
       "title": "Product",
-      "description": "A product in the watch store.",
+      "description": "A product in the store. Can be a watch, shirt, or pant.",
       "type": "object",
       "properties": {
         "name": { "type": "string", "description": "The name of the product." },
         "category": { "type": "string", "enum": ["Men", "Women", "Kids"], "description": "The product category." },
+        "productType": { "type": "string", "enum": ["Watch", "Shirt", "Pant"], "description": "The type of product within a category." },
         "price": { "type": "number", "description": "The price of the product." },
         "description": { "type": "string", "description": "A detailed description of the product." },
         "stockStatus": { "type": "string", "enum": ["Available", "Out of Stock"], "description": "Current stock availability." },
@@ -16,11 +17,14 @@
         "isDealOfTheDay": { "type": "boolean", "description": "Whether the product is a deal of the day." },
         "rating": { "type": "number", "description": "The average user rating." },
         "reviewCount": { "type": "number", "description": "The total number of reviews." },
-        "strap": { "type": "string", "description": "The material of the watch strap." },
-        "color": { "type": "string", "description": "The primary color of the watch." },
+        "color": { "type": "string", "description": "The primary color of the item." },
+        "sizes": { "type": "array", "items": { "type": "string" }, "description": "Available sizes for apparel." },
+        "fit": { "type": "string", "description": "The fit of the apparel (e.g., Slim, Regular)." },
+        "strap": { "type": "string", "description": "The material of the watch strap (if applicable)." },
+        "sleeve": { "type": "string", "description": "The sleeve type for shirts (if applicable)." },
         "createdAt": { "type": "string", "format": "date-time", "description": "The timestamp when the product was created." }
       },
-      "required": ["name", "category", "price", "stockStatus", "createdAt"]
+      "required": ["name", "category", "productType", "price", "stockStatus", "createdAt"]
     }
   },
   "auth": {

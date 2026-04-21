@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { useProducts } from '@/context/product-context';
-import { categories } from '@/lib/data';
+import { categories, menSubCategories } from '@/lib/data';
 import { ProductGrid } from '@/components/product-grid';
 import { ProductFilters } from '@/components/product-filters';
 import {
@@ -13,7 +13,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 import {
   Select,
   SelectContent,
@@ -23,18 +23,29 @@ import {
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function CategoryPage() {
   const params = useParams();
   const category = params.category as string;
   const { products, loading } = useProducts();
   const [sortBy, setSortBy] = useState('trending');
+  const [activeSubCategory, setActiveSubCategory] = useState(menSubCategories[0].slug);
 
+  const isMenCategory = category === 'men';
   const currentCategory = categories.find(c => c.slug === category);
   
-  const filteredProducts = useMemo(() => category === 'all' 
-    ? products 
-    : products.filter(p => p.category.toLowerCase() === category), [products, category]);
+  const filteredProducts = useMemo(() => {
+    if (category === 'all') return products;
+
+    let prods = products.filter(p => p.category.toLowerCase() === category);
+    
+    if (isMenCategory) {
+      prods = prods.filter(p => p.productType.toLowerCase() === activeSubCategory);
+    }
+    
+    return prods;
+  }, [products, category, isMenCategory, activeSubCategory]);
     
   if (!loading && !currentCategory && category !== 'all') {
     notFound();
@@ -65,6 +76,8 @@ export default function CategoryPage() {
 
   const categoryName = currentCategory ? currentCategory.name : 'All';
   const isWomenCategory = category === 'women';
+  const subCategoryName = menSubCategories.find(s => s.slug === activeSubCategory)?.name || '';
+
 
   const ProductGridSkeleton = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -86,21 +99,15 @@ export default function CategoryPage() {
             <BreadcrumbLink href="/">Home</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          {isWomenCategory ? (
-            <BreadcrumbItem>
-              <BreadcrumbPage>Women Watches</BreadcrumbPage>
-            </BreadcrumbItem>
-          ) : (
-            <>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/products/all">Products</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{categoryName} Watches</BreadcrumbPage>
-            </BreadcrumbItem>
-            </>
-          )}
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/products/all">Products</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>
+              {isMenCategory ? `Men's ${subCategoryName}` : `${categoryName} Watches`}
+            </BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       
@@ -111,9 +118,22 @@ export default function CategoryPage() {
             <p className="mt-2 text-lg text-muted-foreground">Elegant and trendy watches for every occasion</p>
           </div>
         ) : (
-          <h1 className="text-4xl font-bold tracking-tight">{categoryName} Watches</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{isMenCategory ? "Men's Collection" : `${categoryName} Watches`}</h1>
+        )}
+         {isMenCategory && (
+            <p className="mt-2 text-lg text-muted-foreground">Explore watches and stylish outfits for every occasion</p>
         )}
       </div>
+
+      {isMenCategory && (
+        <Tabs defaultValue={activeSubCategory} onValueChange={setActiveSubCategory} className="w-full mb-8">
+            <TabsList className="grid w-full grid-cols-3">
+                {menSubCategories.map(sub => (
+                    <TabsTrigger key={sub.slug} value={sub.slug}>{sub.name}</TabsTrigger>
+                ))}
+            </TabsList>
+        </Tabs>
+      )}
 
        <div className="flex items-baseline justify-between mb-8">
         <div className="text-sm text-muted-foreground">{loading ? <Skeleton className="h-5 w-20" /> : `${sortedProducts.length} products`}</div>
@@ -135,7 +155,7 @@ export default function CategoryPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="hidden lg:block">
-          <ProductFilters category={category} />
+          <ProductFilters category={category} subCategory={isMenCategory ? activeSubCategory : undefined} />
         </aside>
         <main className="lg:col-span-3">
           {loading ? <ProductGridSkeleton /> : sortedProducts.length > 0 ? (

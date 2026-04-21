@@ -2,6 +2,7 @@ export type Product = {
   id: string;
   name: string;
   category: 'Men' | 'Women' | 'Kids';
+  productType: 'Watch' | 'Shirt' | 'Pant';
   price: number;
   images: string[];
   description: string;
@@ -11,8 +12,11 @@ export type Product = {
   isDealOfTheDay: boolean;
   rating: number;
   reviewCount: number;
-  strap: string;
   color: string;
+  sizes?: string[];
+  fit?: string;
+  strap?: string;
+  sleeve?: string;
   createdAt?: {
     seconds: number;
     nanoseconds: number;
@@ -25,6 +29,11 @@ export type Category = {
   image: string;
   description: string;
 }
+
+export type SubCategory = {
+  name: string;
+  slug: string;
+};
 
 export type BusinessDetails = {
   shop_name: string;

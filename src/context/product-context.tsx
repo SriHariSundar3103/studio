@@ -8,14 +8,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-export type NewProductData = {
-  name: string;
-  description: string;
-  price: number;
-  category: 'Men' | 'Women' | 'Kids';
-  tags: string[];
-  stockStatus: 'Available' | 'Out of Stock';
-};
+export type NewProductData = Omit<Product, 'id' | 'images' | 'isTrending' | 'isDealOfTheDay' | 'rating' | 'reviewCount' | 'createdAt'>;
 
 interface ProductContextType {
   products: Product[];
@@ -52,9 +45,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         console.log('Seeding database with initial products...');
         const batch = writeBatch(db);
         initialProducts.forEach((product) => {
-          const { id, ...productData } = product;
-          const docRef = doc(productsRef, id); // Use existing ID for consistency
-          batch.set(docRef, { ...productData, createdAt: serverTimestamp() });
+          const docRef = doc(productsRef, product.id);
+          batch.set(docRef, { ...product, createdAt: serverTimestamp() });
         });
         await batch.commit();
       }
@@ -67,14 +59,12 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   const addProduct = useCallback(async (productData: NewProductData) => {
     if (!db) return;
     const newProduct: Omit<Product, 'id' | 'createdAt'> = {
-      ...productData,
       images: ['hsk-m-001-1', 'hsk-m-001-2', 'hsk-m-001-3'], // Placeholder images
       isTrending: false,
       isDealOfTheDay: false,
       rating: 4.5,
       reviewCount: 0,
-      strap: productData.tags.find(t => t.toLowerCase().includes('strap')) || 'Leather',
-      color: 'Black',
+      ...productData,
     };
     const productsRef = collection(db, 'products');
     addDoc(productsRef, {

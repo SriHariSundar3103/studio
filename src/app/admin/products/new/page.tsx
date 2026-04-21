@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { categories } from '@/lib/data';
+import { categories, menSubCategories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
 import { useProducts, type NewProductData } from '@/context/product-context';
@@ -35,6 +35,7 @@ const productSchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters'),
   priceInr: z.coerce.number().min(0, 'Price must be a positive number'),
   category: z.enum(['Men', 'Women', 'Kids']),
+  productType: z.enum(['Watch', 'Shirt', 'Pant']),
   tags: z.string(),
   stockStatus: z.enum(['Available', 'Out of Stock']),
 });
@@ -55,6 +56,7 @@ export default function AddProductPage() {
         description: '',
         priceInr: 0,
         category: 'Men',
+        productType: 'Watch',
         stockStatus: 'Available',
         tags: '',
     },
@@ -67,8 +69,10 @@ export default function AddProductPage() {
         description: data.description,
         price: data.priceInr,
         category: data.category,
+        productType: data.productType,
         tags: data.tags.split(',').map(t => t.trim()).filter(Boolean),
         stockStatus: data.stockStatus,
+        color: 'Default',
     };
     await addProduct(newProductData);
 
@@ -199,7 +203,7 @@ export default function AddProductPage() {
                   <CardTitle>Product Organization</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
+                   <div className="space-y-2">
                     <Label htmlFor="category">Product Category</Label>
                     <Controller
                         control={form.control}
@@ -211,6 +215,25 @@ export default function AddProductPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {categories.map(c => <SelectItem key={c.slug} value={c.name}>{c.name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        )}
+                      />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="productType">Product Type</Label>
+                    <Controller
+                        control={form.control}
+                        name="productType"
+                        render={({ field }) => (
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <SelectTrigger id="productType" aria-label="Select product type">
+                                    <SelectValue placeholder="Select product type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Watch">Watch</SelectItem>
+                                    <SelectItem value="Shirt">Shirt</SelectItem>
+                                    <SelectItem value="Pant">Pant</SelectItem>
                                 </SelectContent>
                             </Select>
                         )}

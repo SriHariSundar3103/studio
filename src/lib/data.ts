@@ -1,4 +1,4 @@
-import type { Product, Category, BusinessDetails } from './types';
+import type { Product, Category, BusinessDetails, SubCategory } from './types';
 
 export const businessDetails: BusinessDetails = {
   shop_name: "Hi/sky",
@@ -18,11 +18,18 @@ export const categories: Category[] = [
   { name: 'Kids', slug: 'kids', image: 'category-kids', description: 'Fun, durable, and easy-to-read watches for the younger generation.' },
 ];
 
-export const products: Product[] = [
+export const menSubCategories: SubCategory[] = [
+  { name: 'Watches', slug: 'watch' },
+  { name: 'Shirts', slug: 'shirt' },
+  { name: 'Pants', slug: 'pant' },
+];
+
+
+export const products: Omit<Product, 'id'>[] = [
   {
-    id: 'hsk-m-001',
     name: 'Hi/sky Voyager',
     category: 'Men',
+    productType: 'Watch',
     price: 4999,
     images: ['hsk-m-001-1', 'hsk-m-001-2', 'hsk-m-001-3'],
     description: 'The Voyager is the quintessential pilot\'s watch, featuring a robust stainless steel case, a high-contrast dial with luminous hands, and a genuine leather strap. Built for adventure, ready for anything.',
@@ -36,9 +43,9 @@ export const products: Product[] = [
     color: 'Silver'
   },
   {
-    id: 'hsk-m-002',
     name: 'Hi/sky Urban Classic',
     category: 'Men',
+    productType: 'Watch',
     price: 2499,
     images: ['hsk-m-002-1', 'hsk-m-002-2', 'hsk-m-002-3'],
     description: 'A masterpiece of minimalist design, the Urban Classic features a clean dial, sleek case, and a comfortable mesh bracelet. Perfect for the modern professional.',
@@ -52,9 +59,9 @@ export const products: Product[] = [
     color: 'Silver'
   },
   {
-    id: 'hsk-w-001',
     name: 'Hi/sky Aura',
     category: 'Women',
+    productType: 'Watch',
     price: 3499,
     images: ['hsk-w-001-1', 'hsk-w-001-2', 'hsk-w-001-3'],
     description: 'Elegance redefined. The Aura watch boasts a beautiful mother-of-pearl dial, rose gold case, and a soft pastel leather strap. It\'s a statement of grace and sophistication.',
@@ -68,9 +75,9 @@ export const products: Product[] = [
     color: 'Rose Gold'
   },
   {
-    id: 'hsk-w-002',
     name: 'Hi/sky Starlight',
     category: 'Women',
+    productType: 'Watch',
     price: 1999,
     images: ['hsk-w-002-1', 'hsk-w-002-2', 'hsk-w-002-3'],
     description: 'Chic and contemporary, the Starlight features a polished silver case and a sparkling crystal-studded bezel. It\'s the perfect accessory to light up your look, day or night.',
@@ -84,9 +91,9 @@ export const products: Product[] = [
     color: 'Silver'
   },
   {
-    id: 'hsk-k-001',
     name: 'Hi/sky Junior Explorer',
     category: 'Kids',
+    productType: 'Watch',
     price: 999,
     images: ['hsk-k-001-1', 'hsk-k-001-2', 'hsk-k-001-3'],
     description: 'Built for fun and adventure! The Junior Explorer is a durable, water-resistant watch with a colorful, easy-to-read dial and a comfortable silicone strap. Learning to tell time has never been so exciting.',
@@ -99,10 +106,10 @@ export const products: Product[] = [
     strap: 'Silicone',
     color: 'Blue'
   },
-    {
-    id: 'hsk-m-003',
+  {
     name: 'Hi/sky Chrono-Sport',
     category: 'Men',
+    productType: 'Watch',
     price: 5999,
     images: ['hsk-m-003-1', 'hsk-m-003-2', 'hsk-m-003-3'],
     description: 'Engineered for performance, the Chrono-Sport combines aggressive styling with precision chronograph functionality. A rugged silicone strap and water resistance up to 100m make it the perfect companion for any challenge.',
@@ -116,9 +123,9 @@ export const products: Product[] = [
     color: 'Black'
   },
   {
-    id: 'hsk-w-003',
     name: 'Hi/sky Petale',
     category: 'Women',
+    productType: 'Watch',
     price: 2799,
     images: ['hsk-w-003-1', 'hsk-w-003-2', 'hsk-w-003-3'],
     description: 'Delicate and feminine, the Petale features a floral-engraved dial and a slender mesh strap in a stunning gold finish. A truly charming timepiece for the modern woman.',
@@ -131,10 +138,10 @@ export const products: Product[] = [
     strap: 'Mesh',
     color: 'Gold'
   },
-    {
-    id: 'hsk-k-002',
+  {
     name: 'Hi/sky Time Teacher',
     category: 'Kids',
+    productType: 'Watch',
     price: 799,
     images: ['hsk-k-002-1', 'hsk-k-002-2', 'hsk-k-002-3'],
     description: 'Make learning to tell time a breeze with the Time Teacher watch. Featuring labeled "HOUR" and "MINUTE" hands and a clear, numbered dial, it\'s the perfect first watch for any child.',
@@ -146,5 +153,79 @@ export const products: Product[] = [
     reviewCount: 412,
     strap: 'Fabric',
     color: 'Pink'
+  },
+  {
+    id: 'hsk-m-shirt-001',
+    name: 'Executive Formal Shirt',
+    category: 'Men',
+    productType: 'Shirt',
+    price: 1899,
+    images: ['hsk-m-shirt-001-1', 'hsk-m-shirt-001-2', 'hsk-m-shirt-001-3'],
+    description: 'A crisp, regular fit formal shirt for the modern professional. Made from premium, breathable cotton for all-day comfort.',
+    stockStatus: 'Available',
+    tags: ['Formal', 'Office Wear'],
+    isTrending: true,
+    isDealOfTheDay: false,
+    rating: 4.6,
+    reviewCount: 92,
+    color: 'White',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    fit: 'Regular Fit',
+    sleeve: 'Full Sleeve'
+  },
+  {
+    id: 'hsk-m-pant-001',
+    name: 'Urban Tech Chinos',
+    category: 'Men',
+    productType: 'Pant',
+    price: 2299,
+    images: ['hsk-m-pant-001-1', 'hsk-m-pant-001-2', 'hsk-m-pant-001-3'],
+    description: 'Versatile slim fit chinos perfect for casual and semi-formal occasions. Made with a stretchable fabric blend for maximum comfort and mobility.',
+    stockStatus: 'Available',
+    tags: ['Casual', 'Smart Casual'],
+    isTrending: true,
+    isDealOfTheDay: false,
+    rating: 4.7,
+    reviewCount: 115,
+    color: 'Khaki',
+    sizes: ['30', '32', '34', '36', '38'],
+    fit: 'Slim'
+  },
+  {
+    id: 'hsk-m-shirt-002',
+    name: 'Casual Checked Shirt',
+    category: 'Men',
+    productType: 'Shirt',
+    price: 1599,
+    images: ['hsk-m-shirt-002-1', 'hsk-m-shirt-002-2', 'hsk-m-shirt-002-3'],
+    description: 'A stylish and comfortable casual shirt with a modern checked pattern. Perfect for weekend outings.',
+    stockStatus: 'Available',
+    tags: ['Casual', 'Checked'],
+    isTrending: false,
+    isDealOfTheDay: false,
+    rating: 4.5,
+    reviewCount: 78,
+    color: 'Blue',
+    sizes: ['M', 'L', 'XL'],
+    fit: 'Slim Fit',
+    sleeve: 'Full Sleeve'
+  },
+  {
+    id: 'hsk-m-pant-002',
+    name: 'Classic Blue Jeans',
+    category: 'Men',
+    productType: 'Pant',
+    price: 2599,
+    images: ['hsk-m-pant-002-1', 'hsk-m-pant-002-2', 'hsk-m-pant-002-3'],
+    description: 'Timeless regular fit jeans made from high-quality denim. A staple for any man\'s wardrobe.',
+    stockStatus: 'Available',
+    tags: ['Jeans', 'Casual'],
+    isTrending: true,
+    isDealOfTheDay: false,
+    rating: 4.8,
+    reviewCount: 210,
+    color: 'Blue',
+    sizes: ['30', '32', '34', '36', '38'],
+    fit: 'Regular'
   }
-];
+].map(p => ({ ...p, id: p.id || `hsk-auto-${Math.random().toString(36).substr(2, 9)}` })) as Product[];
