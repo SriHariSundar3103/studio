@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { useProducts } from '@/context/product-context';
 import { categories } from '@/lib/data';
@@ -26,16 +27,44 @@ export default function CategoryPage() {
   const params = useParams();
   const category = params.category as string;
   const { products } = useProducts();
+  const [sortBy, setSortBy] = useState('trending');
 
   const currentCategory = categories.find(c => c.slug === category);
   
-  const filteredProducts = category === 'all' 
+  const filteredProducts = useMemo(() => category === 'all' 
     ? products 
-    : products.filter(p => p.category.toLowerCase() === category);
+    : products.filter(p => p.category.toLowerCase() === category), [products, category]);
     
   if (!currentCategory && category !== 'all') {
     notFound();
   }
+
+  const sortedProducts = useMemo(() => {
+    let sortableProducts = [...filteredProducts];
+    switch (sortBy) {
+      case 'price-asc':
+        sortableProducts.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        sortableProducts.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        sortableProducts.sort((a, b) => {
+            const idA = parseInt(a.id.split('-').pop()?.replace('new','') || '0');
+            const idB = parseInt(b.id.split('-').pop()?.replace('new','') || '0');
+            return idB - idA;
+        });
+        break;
+      case 'popularity':
+        sortableProducts.sort((a, b) => b.reviewCount - a.reviewCount);
+        break;
+      case 'trending':
+      default:
+        sortableProducts.sort((a, b) => (b.isTrending === a.isTrending)? 0 : b.isTrending? -1 : 1);
+        break;
+    }
+    return sortableProducts;
+  }, [filteredProducts, sortBy]);
 
   const categoryName = currentCategory ? currentCategory.name : 'All';
   const isWomenCategory = category === 'women';
@@ -78,9 +107,9 @@ export default function CategoryPage() {
       </div>
 
        <div className="flex items-baseline justify-between mb-8">
-        <p className="text-sm text-muted-foreground">{filteredProducts.length} products</p>
+        <p className="text-sm text-muted-foreground">{sortedProducts.length} products</p>
         <div className="flex items-center gap-4">
-            <Select>
+            <Select onValueChange={setSortBy} defaultValue="trending">
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -100,9 +129,9 @@ export default function CategoryPage() {
           <ProductFilters category={category} />
         </aside>
         <main className="lg:col-span-3">
-          {filteredProducts.length > 0 ? (
+          {sortedProducts.length > 0 ? (
             <>
-              <ProductGrid products={filteredProducts} />
+              <ProductGrid products={sortedProducts} />
               <div className="flex justify-center items-center mt-12 space-x-1">
                 <Button variant="outline">Previous</Button>
                 <Button variant="outline" size="icon">1</Button>
