@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { products as initialProducts } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
 import type { Product } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Badge } from '@/components/ui/badge';
@@ -46,12 +46,12 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const { products, deleteProduct } = useProducts();
   const { toast } = useToast();
   const router = useRouter();
 
   const handleDeleteProduct = (productId: string) => {
-    setProducts((prevProducts) => prevProducts.filter((p) => p.id !== productId));
+    deleteProduct(productId);
     toast({
         title: 'Product Deleted',
         description: 'The product has been successfully removed.',

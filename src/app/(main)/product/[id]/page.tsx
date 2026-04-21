@@ -1,6 +1,9 @@
+'use client';
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { products, businessDetails } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
+import { businessDetails } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Breadcrumb,
@@ -15,15 +18,45 @@ import { Badge } from '@/components/ui/badge';
 import { Star, CheckCircle, Phone, Heart } from 'lucide-react';
 import { ProductRecommendations } from '@/components/product-recommendations';
 import { Separator } from '@/components/ui/separator';
-
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }));
-}
+import { useEffect, useState } from 'react';
+import type { Product } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = products.find(p => p.id === params.id);
+  const { getProductById } = useProducts();
+  const [product, setProduct] = useState<Product | undefined | null>(undefined);
+
+  useEffect(() => {
+    setProduct(getProductById(params.id));
+  }, [params.id, getProductById]);
+
+  if (product === undefined) {
+    return (
+      <div className="container py-8 md:py-12">
+        <Skeleton className="h-8 w-1/2 mb-8" />
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid gap-4">
+            <Skeleton className="aspect-square w-full" />
+            <div className="grid grid-cols-3 gap-4">
+              <Skeleton className="aspect-square w-full" />
+              <Skeleton className="aspect-square w-full" />
+              <Skeleton className="aspect-square w-full" />
+            </div>
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+            <Skeleton className="h-12 w-1/4" />
+            <Skeleton className="h-24 w-full" />
+            <div className="flex gap-3">
+              <Skeleton className="h-12 flex-1" />
+              <Skeleton className="h-12 flex-1" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     notFound();

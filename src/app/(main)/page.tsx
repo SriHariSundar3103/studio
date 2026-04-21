@@ -1,11 +1,14 @@
+'use client';
+
 import { HeroBanner } from '@/components/hero-banner';
 import { CategoryShowcase } from '@/components/category-showcase';
 import { ProductGrid } from '@/components/product-grid';
-import { products } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function HomePage() {
+  const { products } = useProducts();
   const trendingProducts = products.filter(p => p.isTrending);
   const dealOfTheDayProducts = products.filter(p => p.isDealOfTheDay);
 

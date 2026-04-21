@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from '@/lib/utils';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: 'Hi/sky Time - Premium Watches for Everyone',
@@ -24,7 +25,9 @@ export default function RootLayout({
       <body className={cn(
         "font-body antialiased bg-background text-foreground",
       )}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
       </body>
     </html>

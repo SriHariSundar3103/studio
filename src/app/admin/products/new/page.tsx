@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { categories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
+import { useProducts, type NewProductData } from '@/context/product-context';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
@@ -43,6 +44,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
 export default function AddProductPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { addProduct } = useProducts();
   const [isGenerating, setIsGenerating] = useState(false);
   
   const form = useForm<ProductFormValues>({
@@ -58,7 +60,16 @@ export default function AddProductPage() {
   });
 
   const onSubmit = (data: ProductFormValues) => {
-    console.log('New Product Data:', data);
+    const newProductData: NewProductData = {
+        name: data.productName,
+        description: data.description,
+        price: data.priceInr,
+        category: data.category,
+        tags: data.tags.split(',').map(t => t.trim()).filter(Boolean),
+        stockStatus: data.stockStatus,
+    };
+    addProduct(newProductData);
+
     toast({
       title: 'Product Added',
       description: `${data.productName} has been successfully added.`,

@@ -1,5 +1,8 @@
+'use client';
+
 import { notFound } from 'next/navigation';
-import { products, categories } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
+import { categories } from '@/lib/data';
 import { ProductGrid } from '@/components/product-grid';
 import { ProductFilters } from '@/components/product-filters';
 import {
@@ -19,16 +22,9 @@ import {
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 
-
-export async function generateStaticParams() {
-  const allCategories = categories.map((category) => ({
-    category: category.slug,
-  }));
-  return [...allCategories, { category: 'all' }];
-}
-
 export default function CategoryPage({ params }: { params: { category: string } }) {
   const { category } = params;
+  const { products } = useProducts();
 
   const currentCategory = categories.find(c => c.slug === category);
   

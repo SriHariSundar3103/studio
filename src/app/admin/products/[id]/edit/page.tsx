@@ -25,11 +25,12 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { categories, products as initialProducts } from '@/lib/data';
+import { categories } from '@/lib/data';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/admin-product-description-generator';
 import type { Product } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useProducts } from '@/context/product-context';
 
 const productSchema = z.object({
   productName: z.string().min(3, 'Product name must be at least 3 characters'),
@@ -48,6 +49,7 @@ export default function EditProductPage() {
   const params = useParams();
   const id = params.id as string;
   const { toast } = useToast();
+  const { getProductById, updateProduct } = useProducts();
   const [isGenerating, setIsGenerating] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   
@@ -57,7 +59,7 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (id) {
-      const productToEdit = initialProducts.find(p => p.id === id);
+      const productToEdit = getProductById(id);
       if (productToEdit) {
         setProduct(productToEdit);
         form.reset({
@@ -78,13 +80,24 @@ export default function EditProductPage() {
         router.push('/admin/products');
       }
     }
-  }, [id, router, toast, form]);
+  }, [id, router, toast, form, getProductById]);
 
   const onSubmit = (data: ProductFormValues) => {
-    console.log('Updated Product Data:', { ...data, id });
+    const updatedData: Partial<Product> = {
+        name: data.productName,
+        description: data.description,
+        price: data.priceInr,
+        category: data.category,
+        tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        stockStatus: data.stockStatus,
+        images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : product?.images,
+    };
+
+    updateProduct(id, updatedData);
+    
     toast({
       title: 'Product Updated',
-      description: `${data.productName} has been successfully updated. Note: changes are not persistent.`,
+      description: `${data.productName} has been successfully updated.`,
     });
     router.push('/admin/products');
   };

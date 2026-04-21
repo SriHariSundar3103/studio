@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import type { Product } from '@/lib/types';
 import { aiProductRecommendations, type AiProductRecommendationsOutput } from '@/ai/flows/ai-product-recommendations';
 import { ProductGrid } from '@/components/product-grid';
-import { products as allProducts } from '@/lib/data';
+import { useProducts } from '@/context/product-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -12,13 +12,14 @@ interface ProductRecommendationsProps {
   product: Product;
 }
 
-const mapProductIdsToProducts = (ids: string[]) => {
-  return ids.map(id => allProducts.find(p => p.id === id)).filter((p): p is Product => !!p);
-};
-
 export function ProductRecommendations({ product }: ProductRecommendationsProps) {
   const [recommendations, setRecommendations] = useState<AiProductRecommendationsOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  const { products: allProducts } = useProducts();
+
+  const mapProductIdsToProducts = (ids: string[]) => {
+    return ids.map(id => allProducts.find(p => p.id === id)).filter((p): p is Product => !!p);
+  };
 
   useEffect(() => {
     const fetchRecommendations = async () => {
