@@ -1,17 +1,222 @@
+/**
+ * Core Philosophy:
+ * This ruleset establishes a security model with two primary zones. The first zone consists of public-facing
+ * e-commerce data (Products, Categories, Images, etc.), which is readable by all users (including anonymous ones)
+ * but writable only by authenticated administrators. The second zone protects user-specific private data (Wishlists),
+ * enforcing a strict ownership model where users can only access their own documents.
+ *
+ * Data Structure:
+ * - Public data (products, categories, tags, images, heroBanners, shopSettings) is stored in top-level collections.
+ * - Private user data (wishlists) is stored in a top-level collection where the document ID is the user's UID
+ *   (e.g., /wishlists/{userId}).
+ * - Administrative roles are managed in a dedicated top-level collection (/roles_admin/{userId}) to control
+ *   write access to the public data collections.
+ *
+ * Key Security Decisions:
+ * - Public Read-Only by Default: All collections containing shop data are publicly readable to support the e-commerce
+ *   frontend for all visitors.
+ * - Admin-Only Writes: All write operations (create, update, delete) on shop data are strictly limited to users
+ *   who have an administrator role, verified by checking for a document in the /roles_admin collection.
+ * - Strict User Ownership: The /wishlists collection is segregated by user ID. A user can only read or write to
+ *   the document matching their own authentication UID, preventing any cross-user data access.
+ * - Admin Management: Only existing administrators can add or remove other administrators, ensuring a controlled
+ *   chain of trust for privileged access.
+ *
+ * Denormalization for Authorization:
+ * - Wishlist Ownership: The /wishlists/{userId} path uses the user's UID as the document ID. Additionally, a `userId`
+ *   field is stored inside the document. This allows for simple, fast, and secure ownership checks (`request.auth.uid == userId`)
+ *   without needing any costly `get()` or `exists()` calls to other collections.
+ * - Global Admin Roles: Administrator status is determined by the existence of a document at `/roles_admin/{userId}`.
+ *   This 'Existence over Content' pattern allows for a single, performant `exists()` call in a helper function (`isAdmin()`)
+ *   to check for privileges across all relevant rules.
+ *
+ * Structural Segregation:
+ * - The ruleset cleanly separates public data from private data by using different top-level collections. Public
+ *   product data lives in `/products`, while private user wishlists are in `/wishlists`. This prevents accidental
+ *   data exposure and simplifies query security, as `list` operations on public collections are inherently safe.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user has an administrator role.
+     * Role is granted by the existence of a document in the /roles_admin collection.
+     */
     function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     * Used to verify ownership of a resource.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Validates that the user is the owner and that the document already exists.
+     * Prevents modification or deletion of non-existent documents.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Validates that an admin is operating on an existing document.
+     */
+    function isExistingAdmin() {
+        return isAdmin() && resource != null;
+    }
+
+    /**
+     * On create, validates that a wishlist's internal userId field matches the document ID owner.
+     */
+    function isCreatingOwnWishlist(userId) {
+      return isOwner(userId) && request.resource.data.userId == userId;
+    }
+
+    /**
+     * On update, ensures the internal userId field remains unchanged.
+     */
+    function isUpdatingOwnWishlist(userId) {
+      // Check for ownership, document existence, and immutability of the userId link.
+      return isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+    }
+
+
+    // ----------------------------------------------------------------------
+    // Public E-Commerce Collections (Admin-Write)
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Controls access to product data. Readable by everyone, writable only by admins.
+     * @path /products/{productId}
+     * @allow (get) Any user, signed in or not, can read a product's details.
+     * @deny (create) A regular signed-in user cannot create a new product.
+     * @principle Public read access for catalog browsing, with centralized admin control for content management.
+     */
     match /products/{productId} {
-      allow read: if true;
-      allow write: if request.auth != null && isAdmin();
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
     }
 
-    match /users/{userId} {
-      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    /**
+     * @description Controls access to product categories. Readable by everyone, writable only by admins.
+     * @path /categories/{categoryId}
+     * @allow (get) Any user, signed in or not, can read a category's details.
+     * @deny (update) A regular signed-in user cannot update a category.
+     * @principle Public read access for site navigation, with centralized admin control for content management.
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
     }
+
+    /**
+     * @description Controls access to image metadata. Readable by everyone, writable only by admins.
+     * @path /images/{imageId}
+     * @allow (list) Any client can list all image documents.
+     * @deny (delete) A regular signed-in user cannot delete an image document.
+     * @principle Public read access for displaying images, with centralized admin control for asset management.
+     */
+    match /images/{imageId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Controls access to product tags. Readable by everyone, writable only by admins.
+     * @path /tags/{tagId}
+     * @allow (get) Any user can read tag information for filtering products.
+     * @deny (create) A regular signed-in user cannot create a new tag.
+     * @principle Public read access for product filtering, with centralized admin control for taxonomy.
+     */
+    match /tags/{tagId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Controls access to hero banners. Readable by everyone, writable only by admins.
+     * @path /heroBanners/{bannerId}
+     * @allow (list) The frontend can list all banners to display them.
+     * @deny (update) A regular signed-in user cannot update a banner.
+     * @principle Public read access for marketing content, with centralized admin control.
+     */
+    match /heroBanners/{bannerId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Controls access to the global shop settings. Readable by everyone, writable only by admins.
+     * @path /shopSettings/global
+     * @allow (get) Any user can read the shop's contact information.
+     * @deny (update) A regular signed-in user cannot change the shop's email address.
+     * @principle Secures a singleton configuration document, allowing public read but restricted write.
+     */
+    match /shopSettings/global {
+      allow get: if true;
+      allow list: if false; // This is a singleton document, list is not applicable.
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
+    }
+
+
+    // ----------------------------------------------------------------------
+    // User-Private Collections (Owner-Only)
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Controls access to a user's wishlist. Only the owner can read or write their own wishlist.
+     * @path /wishlists/{userId}
+     * @allow (create) A signed-in user (auth.uid: 'user123') can create their own wishlist at /wishlists/user123.
+     * @deny (get) A user (auth.uid: 'user456') cannot read the wishlist at /wishlists/user123.
+     * @principle Enforces strict data privacy and ownership. Path-based security and denormalized `userId` ensure integrity.
+     */
+    match /wishlists/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isCreatingOwnWishlist(userId);
+      allow update: if isUpdatingOwnWishlist(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+
+    // ----------------------------------------------------------------------
+    // Administrative Collections
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Manages who is an administrator. Only other admins can view or modify the list of admins.
+     * @path /roles_admin/{userId}
+     * @allow (create) An existing admin can create a document for a new user to grant them admin rights.
+     * @deny (get) A non-admin user cannot read who the other admins are.
+     * @deny (delete) A non-admin user cannot revoke their own (or anyone else's) admin status.
+     * @principle Secures the role-management system itself, ensuring only privileged users can grant or revoke privileges.
+     */
+    match /roles_admin/{userId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isExistingAdmin();
+    }
+
   }
 }
