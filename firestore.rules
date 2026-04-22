@@ -71,7 +71,7 @@ service cloud.firestore {
     }
     match /images/{imageId} {
       allow get, list: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
     match /tags/{tagId} {
       allow get, list: if true;
