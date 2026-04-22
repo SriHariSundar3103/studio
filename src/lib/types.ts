@@ -57,4 +57,9 @@ export interface NavLink {
   name: string;
   slug: string;
 }
+export interface UserProfile {
+  role: 'admin' | 'user';
+  displayName?: string;
+  photoURL?: string;
+}
 
