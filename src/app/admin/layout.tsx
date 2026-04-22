@@ -30,15 +30,15 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAdmin, loading } = useUserProfile();
+  const { isAdmin, loading, user, userProfile } = useUserProfile();
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    if (!loading && user && (!userProfile || userProfile.role !== 'admin')) {
       router.replace('/');
     }
-  }, [isAdmin, loading, router]);
+  }, [user, userProfile, loading, router]);
 
-  if (loading || !isAdmin) {
+  if (loading || (user && userProfile && userProfile.role !== 'admin')) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -137,3 +137,4 @@ export default function AdminLayout({
     </div>
   );
 }
+
