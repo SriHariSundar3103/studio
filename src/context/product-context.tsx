@@ -1,9 +1,12 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useCallback, useState, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
 import type { Product } from '@/lib/types';
-import { useUser } from '@/firebase/auth/use-user';
-import { categories } from '@/lib/data';
+import { useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useUserProfile } from '@/firebase/auth/use-user-profile';
+import { addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 
 const ProductContext = createContext({
   products: [] as Product[],
@@ -11,80 +14,61 @@ const ProductContext = createContext({
   addProduct: async () => {},
   updateProduct: async () => {},
   deleteProduct: async () => {},
-getProductById: (id: string) => undefined as Product | undefined,
+  getProductById: (id: string) => undefined as Product | undefined,
 } as any);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { user } = useUser();
-  const isAdmin = user?.email === 'admin@example.com'; // Mock
+  const db = useFirestore();
+  const { isAdmin, loading: profileLoading } = useUserProfile();
 
-  useEffect(() => {
-    // Demo products
-    const demoProducts: Product[] = [
-      {
-        id: '1',
-        name: 'Demo Watch 1',
-        category: 'Men',
-        productType: 'watch',
-        price: 4999,
-        images: ['hsk-m-001-1'],
-        description: 'Demo product - local state only',
-        stockStatus: 'Available',
-        tags: ['demo'],
-        isTrending: true,
-        isDealOfTheDay: false,
-        rating: 4.5,
-        reviewCount: 10,
-        viewCount: 100,
-        createdAt: new Date().toISOString(),
-      },
-    ];
-    setProducts(demoProducts);
-  }, []);
+  const productsQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'products') as any;
+  }, [db]);
 
-  const addProduct = async (productData: any) => {
-    if (!isAdmin) return;
-    setLoading(true);
-    const newProduct: Product = {
+  const { data: productsData, isLoading: collectionLoading, error } = useCollection<Product>(productsQuery);
+
+  const products = useMemo(() => productsData || [], [productsData]);
+
+  const addProduct = useCallback(async (productData: Omit<Product, 'id' | 'createdAt'>) => {
+    if (!isAdmin || !db) return;
+    await addDoc(collection(db, 'products'), {
       ...productData,
-      id: `demo-${Date.now()}`,
+      createdAt: serverTimestamp(),
       isTrending: false,
       isDealOfTheDay: false,
-      rating: 4.0,
+      rating: 0,
       reviewCount: 0,
       viewCount: 0,
-      createdAt: new Date().toISOString(),
-    };
-    setProducts(prev => [...prev, newProduct]);
-    setLoading(false);
-    console.log('Added demo product:', newProduct);
-  };
+    });
+  }, [isAdmin, db]);
 
-  const updateProduct = async (id: string, updates: any) => {
-    if (!isAdmin) return;
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-  };
+  const updateProduct = useCallback(async (id: string, updates: Partial<Product>) => {
+    if (!isAdmin || !db) return;
+    await updateDoc(doc(db, 'products', id), updates);
+  }, [isAdmin, db]);
 
-  const deleteProduct = async (id: string) => {
-    if (!isAdmin) return;
-    setProducts(prev => prev.filter(p => p.id !== id));
-  };
+  const deleteProduct = useCallback(async (id: string) => {
+    if (!isAdmin || !db) return;
+    await deleteDoc(doc(db, 'products', id));
+  }, [isAdmin, db]);
 
-  const getProductById = (id: string) => {
-    return products.find(p => p.id === id);
+  const getProductById = useCallback((id: string) => {
+    return products.find((p: Product) => p.id === id);
+  }, [products]);
+
+  const contextValue = {
+    products,
+    loading: collectionLoading || profileLoading,
+    error,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    getProductById,
   };
 
   return (
-    <ProductContext.Provider value={{
-      products,
-      loading,
-      addProduct,
-      updateProduct,
-      deleteProduct,
-      getProductById,
-    }}>
+    <ProductContext.Provider value={contextValue}>
       {children}
     </ProductContext.Provider>
   );
