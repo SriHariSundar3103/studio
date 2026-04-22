@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Package, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   Tooltip,
   TooltipContent,
@@ -30,15 +30,15 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAdmin, loading } = useUserProfile();
+  const { isAdmin, loading, user, userProfile } = useUserProfile();
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    if (!loading && user && (!userProfile || userProfile.role !== 'admin')) {
       router.replace('/');
     }
-  }, [isAdmin, loading, router]);
+  }, [user, userProfile, loading, router]);
 
-  if (loading || !isAdmin) {
+  if (loading || (user && userProfile && userProfile.role !== 'admin')) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -88,7 +88,8 @@ export default function AdminLayout({
             <span className="sr-only">Toggle Menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
+<SheetContent side="left" className="sm:max-w-xs">
+          <SheetTitle className="sr-only">Admin menu</SheetTitle>
           <nav className="grid gap-6 text-lg font-medium">
             <Link
               href="/"
@@ -136,3 +137,4 @@ export default function AdminLayout({
     </div>
   );
 }
+
